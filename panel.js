@@ -247,7 +247,7 @@
     return { ok: false, reason: 'чат ашылмады' };
   }
 
-  const DEFAULTS = { delayMin: 5, delayMax: 12, batchSize: 30, batchPause: 60, country: '7' };
+  const DEFAULTS = { delayMin: 3, delayMax: 6, batchSize: 40, batchPause: 30, country: '7' };
   const store = {
     get(key, fallback) {
       try {
@@ -264,6 +264,9 @@
     },
   };
   let settings = { ...DEFAULTS, ...store.get('settings', {}) };
+  if (settings.delayMin === 5 && settings.delayMax === 12 && settings.batchSize === 30 && settings.batchPause === 60) {
+    Object.assign(settings, { delayMin: 3, delayMax: 6, batchSize: 40, batchPause: 30 });
+  }
   let rows = [];
   let mode = store.get('mode', 'wa');
   let membersList = '';
@@ -542,7 +545,7 @@ details[open] summary { margin-bottom: 10px; }
         <summary>${ic('gear')}Баптаулар</summary>
         <div class="presets">
           <button class="preset" id="turbo"><b>Жылдам</b><span>кідіріссіз</span></button>
-          <button class="preset" id="safe"><b>Қауіпсіз</b><span>5–12 сек</span></button>
+          <button class="preset" id="safe"><b>Қауіпсіз</b><span>3–6 сек</span></button>
         </div>
         <div class="settings">
           <label>Кідіріс min, сек<input id="delayMin" type="number" min="0" step="0.5"></label>
@@ -983,7 +986,7 @@ details[open] summary { margin-bottom: 10px; }
     toast('Жылдам режим қосылды');
   };
   $('safe').onclick = () => {
-    Object.assign(settings, { delayMin: 5, delayMax: 12, batchSize: 30, batchPause: 60 });
+    Object.assign(settings, { delayMin: 3, delayMax: 6, batchSize: 40, batchPause: 30 });
     store.set('settings', settings);
     fillSettings();
     toast('Қауіпсіз режим қосылды');

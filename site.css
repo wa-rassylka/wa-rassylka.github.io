@@ -642,7 +642,7 @@ a.logo { text-decoration: none; }
 .steps p { margin: 0; font-size: 13px; line-height: 1.55; color: var(--muted); }
 
 .section-title { margin: 56px 0 16px; text-align: center; font-size: 13px; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
-.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .feature { padding: 22px; }
 .feature .f-icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 14px; background: var(--brand-soft); color: var(--brand-ink); margin-bottom: 14px; }
 .feature .f-icon .icon { width: 22px; height: 22px; }

@@ -99,15 +99,41 @@
   }
 
   async function waSendInOpenChat(text, expectHeader, startsWith = false) {
-    const header = document.querySelector('#main header');
-    const headerOk = (h) => (startsWith ? norm(h).startsWith(norm(expectHeader)) : norm(h).includes(norm(expectHeader)));
-    if (expectHeader && !(header && headerOk(header.innerText))) return { ok: false, reason: 'ашық чат басқа адамдікі, жіберілмеді' };
-    const compose = document.querySelector('#main footer [contenteditable="true"]');
-    if (!compose) return { ok: false, reason: 'хабарлама жолы табылмады' };
-    const rowsBefore = document.querySelectorAll('#main [role="row"]').length;
+    const headerOk = () => {
+      const h = document.querySelector('#main header');
+      if (!expectHeader) return true;
+      return !!h && (startsWith ? norm(h.innerText).startsWith(norm(expectHeader)) : norm(h.innerText).includes(norm(expectHeader)));
+    };
+    const getCompose = () => document.querySelector('#main footer [contenteditable="true"]');
+    const clear = (el) => {
+      el.focus();
+      document.execCommand('selectAll', false);
+      document.execCommand('delete', false);
+    };
+    if (!headerOk()) return { ok: false, reason: 'ашық чат басқа адамдікі, жіберілмеді' };
+    await sleep(250);
+    let compose = getCompose();
+    if (!compose || !headerOk()) return { ok: false, reason: 'хабарлама жолы табылмады' };
     compose.focus();
-    if (!compose.innerText.trim()) document.execCommand('insertText', false, text);
     await sleep(60);
+    if (!compose.contains(document.activeElement)) return { ok: false, reason: 'хабарлама жолына кіру мүмкін болмады' };
+    for (let i = 0; i < 3 && compose.innerText.trim(); i++) {
+      clear(compose);
+      await sleep(80);
+    }
+    if (compose.innerText.trim()) return { ok: false, reason: 'чатта бұрыннан жазылған мәтін тұр, жіберілмеді' };
+    document.execCommand('insertText', false, text);
+    await sleep(120);
+    compose = getCompose();
+    if (!compose || compact(compose.innerText) !== compact(text)) {
+      if (compose) clear(compose);
+      return { ok: false, reason: 'мәтін дұрыс жазылмады, жіберілмеді' };
+    }
+    if (!headerOk()) {
+      clear(compose);
+      return { ok: false, reason: 'чат ауысып кетті, жіберілмеді' };
+    }
+    const rowsBefore = document.querySelectorAll('#main [role="row"]').length;
     const sendIcon = document.querySelector('#main footer [data-icon="send"], #main footer [data-icon="wds-ic-send-filled"], #main footer button[aria-label="Отправить"], #main footer button[aria-label="Send"], #main footer button[aria-label="Жіберу"]');
     if (sendIcon) (sendIcon.closest('button') || sendIcon).click();
     else compose.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', code: 'Enter', keyCode: 13, which: 13, bubbles: true }));
@@ -116,10 +142,11 @@
       await sleep(75);
       const rows = document.querySelectorAll('#main [role="row"]');
       const last = rows[rows.length - 1];
-      if (!compose.innerText.trim() && last && compact(last.innerText).includes(head) && rows.length >= rowsBefore) return { ok: true };
+      if (!getCompose()?.innerText.trim() && last && compact(last.innerText).includes(head) && rows.length >= rowsBefore) return { ok: true };
     }
     return { ok: false, reason: 'жіберілгені расталмады — чатты тексеріңіз' };
   }
+
 
   const nameOf = (b) => [...b.querySelectorAll('span')].filter((s) => !s.children.length).map((s) => s.textContent.trim()).find(Boolean);
 
@@ -247,7 +274,7 @@
     return { ok: false, reason: 'чат ашылмады' };
   }
 
-  const DEFAULTS = { delayMin: 3, delayMax: 6, batchSize: 40, batchPause: 30, country: '7' };
+  const DEFAULT_TEMPLATE = 'Қайырлы кеш☺️ Балаңыз {аты} мына тапсырманы тапсырмаған: №7 Конспект (дедлайн өткеніне 1 күн). Тапсырманы бүгіннен қалдырмай орындауы қажет, әйтпесе басқа оқушылардан артта қалып, тақырыпты дұрыс түсінбей қалуы мүмкін. Тапсырманы бүгіннен қалдырмай орындауын қадағалап жіберсеңіз!';
   const store = {
     get(key, fallback) {
       try {
@@ -263,12 +290,8 @@
       } catch (e) {}
     },
   };
-  let settings = { ...DEFAULTS, ...store.get('settings', {}) };
-  if (settings.delayMin === 5 && settings.delayMax === 12 && settings.batchSize === 30 && settings.batchPause === 60) {
-    Object.assign(settings, { delayMin: 3, delayMax: 6, batchSize: 40, batchPause: 30 });
-  }
   let rows = [];
-  let mode = store.get('mode', 'wa');
+  let mode = store.get('mode', 'wa') === 'juz' ? 'juz' : 'wa';
   let membersList = '';
   let running = false;
   let stopRequested = false;
@@ -290,13 +313,6 @@
     s = s.replace(/\s+/g, ' ').trim();
     if (s && s === s.toLocaleUpperCase('kk')) s = titleCase(s);
     return s;
-  }
-  function normPhone(raw) {
-    let d = (raw || '').replace(/\D/g, '');
-    const cc = String(settings.country || '').replace(/\D/g, '');
-    if (cc === '7' && d.length === 11 && d[0] === '8') d = '7' + d.slice(1);
-    else if (cc && d.length === 10) d = cc + d;
-    return d.length >= 10 && d.length <= 15 ? d : '';
   }
   function render(template, p) {
     let s = template.replace(/\{([^{}|]*\|[^{}]*)\}/g, (_, opts) => {
@@ -437,15 +453,6 @@ input[type=checkbox]:checked::after { transform: translateY(-1px) rotate(45deg) 
 .ptext { display: flex; justify-content: space-between; font-size: 12px; font-weight: 650; margin-bottom: 6px; color: var(--muted); }
 .actions { display: grid; grid-template-columns: auto auto 1fr; gap: 8px; }
 .send { padding: 11px 14px; font-size: 14px; }
-.settings { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.settings label { display: flex; flex-direction: column; gap: 4px; font-size: 11.5px; color: var(--muted); font-weight: 650; }
-.presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
-.preset { flex-direction: column; align-items: flex-start; gap: 1px; padding: 9px 11px; background: var(--field); border-color: var(--field-border); }
-.preset span { font-size: 11px; color: var(--muted); font-weight: 500; }
-.preset:hover { border-color: var(--brand); }
-details summary { cursor: pointer; list-style: none; font-weight: 700; font-size: 13px; display: flex; align-items: center; gap: 8px; }
-details summary::-webkit-details-marker { display: none; }
-details[open] summary { margin-bottom: 10px; }
 .toast { position: absolute; left: 50%; bottom: 120px; transform: translateX(-50%); padding: 8px 14px; border-radius: 99px; background: rgba(10,20,17,.94); color: #fff; font-size: 12.5px; font-weight: 650; white-space: nowrap; box-shadow: 0 10px 30px rgba(0,0,0,.4); transition: opacity .25s, transform .3s var(--spring); }
 .toast.hidden { display: block !important; opacity: 0; transform: translate(-50%, 10px); pointer-events: none; }
 .fab { position: fixed; right: 18px; bottom: 18px; z-index: 2147483000; width: 56px; height: 56px; padding: 0; border-radius: 50%;
@@ -503,21 +510,15 @@ details[open] summary { margin-bottom: 10px; }
       <div class="card">
         <div class="seg" id="modes">
           <button data-mode="wa">WhatsApp тізімі</button>
-          <button data-mode="manual">Өз тізімім</button>
           <button data-mode="juz">JUZ40</button>
         </div>
         <div data-pane="wa" class="mt">
           <div class="row"><select id="waList"><option value="">— тізімдерді жүктеңіз —</option></select><button class="ghost" id="loadLists" title="Тізімдерді жүктеу">${ic('refresh')}</button></div>
           <button class="primary wide mt" id="loadMembers">${ic('users')}Адамдарды көрсету</button>
         </div>
-        <div data-pane="manual" class="mt">
-          <textarea id="list" rows="5" placeholder="Әр жолға бір адам:&#10;87011234567; Айгерім&#10;АА БЕРДІМҰРАТ АСЫЛЖАН; Асылжан"></textarea>
-          <button class="primary wide mt" id="loadManual">${ic('users')}Адамдарды көрсету</button>
-          <div class="hint">Нөмір болса — нөмір бойынша, болмаса — контакт аты бойынша ізделеді. Google Sheets-тен көшіріп қоюға болады.</div>
-        </div>
         <div data-pane="juz" class="mt">
           <button class="primary wide" id="openJuz">${ic('ext')}JUZ40-ты ашу</button>
-          <div class="hint">Жаңа терезеде JUZ40-қа кіріп, тапсырмаларды таңдайсыз. «Панельге жіберу» басқанда тапсырмағандар осында шығады.</div>
+          <div class="hint">Жаңа терезеде JUZ40-қа кіріп, «Тапсырмағандар» немесе «Еске салу» режимін таңдайсыз. «WhatsApp панеліне жіберу» басқанда тізім осында шығады.</div>
         </div>
       </div>
 
@@ -541,19 +542,6 @@ details[open] summary { margin-bottom: 10px; }
         <div class="people" id="people"><div class="empty"><b>Әзірге ешкім жоқ</b>Жоғарыдан тізімді таңдап, «Адамдарды көрсету» басыңыз.</div></div>
       </div>
 
-      <details class="card">
-        <summary>${ic('gear')}Баптаулар</summary>
-        <div class="presets">
-          <button class="preset" id="turbo"><b>Жылдам</b><span>кідіріссіз</span></button>
-          <button class="preset" id="safe"><b>Қауіпсіз</b><span>3–6 сек</span></button>
-        </div>
-        <div class="settings">
-          <label>Кідіріс min, сек<input id="delayMin" type="number" min="0" step="0.5"></label>
-          <label>Кідіріс max, сек<input id="delayMax" type="number" min="0" step="0.5"></label>
-          <label>Әр N-нан кейін<input id="batchSize" type="number" min="0"></label>
-          <label>Үзіліс, сек<input id="batchPause" type="number" min="0"></label>
-        </div>
-      </details>
     </div>
     <div class="dock">
       <div id="progress" class="hidden">
@@ -765,26 +753,6 @@ details[open] summary { margin-bottom: 10px; }
     }
   }
 
-  function loadManual() {
-    const out = [];
-    const seen = new Set();
-    for (const line of $('list').value.split(/\r?\n/)) {
-      if (!line.trim()) continue;
-      const cells = (line.includes('\t') ? line.split('\t') : line.split(';')).map((c) => c.trim());
-      const pi = cells.findIndex((c) => /^[+\d][\d\s()\-.]{8,}$/.test(c) && c.replace(/\D/g, '').length >= 10);
-      const phone = pi >= 0 ? normPhone(cells[pi]) : '';
-      const others = cells.filter((_, i) => i !== pi).filter(Boolean);
-      const target = phone || others[0];
-      if (!target || seen.has(target)) continue;
-      seen.add(target);
-      const nm = phone ? others[0] || '' : others[1] || '';
-      out.push({ kind: phone ? 'phone' : 'contact', target, label: phone ? nm || '+' + phone : others[0], sub: phone ? '+' + phone : 'контакт', name: nm, first: nm.split(' ')[0], phone, cells: others, title: phone ? '' : others[0] });
-    }
-    store.set('manual', $('list').value);
-    if (!out.length) return toast('Тізім бос');
-    setRows(out);
-  }
-
   function openJuz() {
     const w = window.open(SITE + 'juz40.html', 'juz40-rassylka', 'width=1240,height=880');
     if (!w) toast('Браузер терезені бұғаттады — рұқсат беріңіз');
@@ -857,11 +825,10 @@ details[open] summary { margin-bottom: 10px; }
     if (!dry && !confirm(`${todo.length} адамға хабарлама жіберілсін бе?`)) return;
     running = true;
     stopRequested = false;
-    ['dry', 'send', 'loadMembers', 'loadManual'].forEach((id) => ($(id).disabled = true));
+    ['dry', 'send', 'loadMembers'].forEach((id) => ($(id).disabled = true));
     $('stop').disabled = false;
     let ok = 0;
     let fail = 0;
-    let sinceBreak = 0;
     setProgress(0, todo.length, 0, 0, dry ? 'Тексерілуде…' : 'Жіберілуде…');
     try {
       for (let k = 0; k < todo.length && !stopRequested; k++) {
@@ -879,7 +846,6 @@ details[open] summary { margin-bottom: 10px; }
           setState(i, 'табылды: ' + res.via, 'ok', 'search');
         } else if (res.ok) {
           ok++;
-          sinceBreak++;
           r.checked = false;
           addSent(r.sentKey);
           setState(i, 'жіберілді: ' + res.via, 'ok', 'check');
@@ -893,25 +859,10 @@ details[open] summary { margin-bottom: 10px; }
           setState(i, res.reason, 'fail', 'x');
         }
         setProgress(k + 1, todo.length, ok, fail, `${k + 1} / ${todo.length}`);
-        if (dry || k === todo.length - 1 || stopRequested) continue;
-        const bs = +settings.batchSize || 0;
-        let wait;
-        if (bs && sinceBreak >= bs && +settings.batchPause > 0) {
-          sinceBreak = 0;
-          wait = +settings.batchPause;
-        } else {
-          const min = Math.max(0, parseFloat(settings.delayMin) || 0);
-          const max = Math.max(min, parseFloat(settings.delayMax) || 0);
-          wait = min + Math.random() * (max - min);
-        }
-        for (let s = wait; s > 0 && !stopRequested; s -= 1) {
-          $('pText').textContent = `Келесісі ${Math.ceil(s)} сек…`;
-          await sleep(Math.min(1, s) * 1000);
-        }
       }
     } finally {
       running = false;
-      ['dry', 'send', 'loadMembers', 'loadManual'].forEach((id) => ($(id).disabled = false));
+      ['dry', 'send', 'loadMembers'].forEach((id) => ($(id).disabled = false));
       $('stop').disabled = true;
       root.querySelectorAll('.person.active').forEach((p) => p.classList.remove('active'));
       $('pText').textContent = `${stopRequested ? 'Тоқтатылды' : 'Аяқталды'}: ${dry ? 'табылды' : 'жіберілді'} ${ok}, қате ${fail}`;
@@ -920,13 +871,6 @@ details[open] summary { margin-bottom: 10px; }
     }
   }
 
-  function saveSettings() {
-    for (const k of ['delayMin', 'delayMax', 'batchSize', 'batchPause']) settings[k] = parseFloat($(k).value) || 0;
-    store.set('settings', settings);
-  }
-  function fillSettings() {
-    for (const k of ['delayMin', 'delayMax', 'batchSize', 'batchPause']) $(k).value = settings[k];
-  }
 
   function showPanel() {
     $('panel').classList.remove('hidden');
@@ -970,26 +914,12 @@ details[open] summary { margin-bottom: 10px; }
   };
   $('loadLists').onclick = loadLists;
   $('loadMembers').onclick = loadMembers;
-  $('loadManual').onclick = loadManual;
   $('openJuz').onclick = openJuz;
   $('dry').onclick = () => sendAll(true);
   $('send').onclick = () => sendAll(false);
   $('stop').onclick = () => {
     stopRequested = true;
     toast('Тоқтатылуда…');
-  };
-  ['delayMin', 'delayMax', 'batchSize', 'batchPause'].forEach((k) => ($(k).onchange = saveSettings));
-  $('turbo').onclick = () => {
-    Object.assign(settings, { delayMin: 0, delayMax: 0, batchSize: 0, batchPause: 0 });
-    store.set('settings', settings);
-    fillSettings();
-    toast('Жылдам режим қосылды');
-  };
-  $('safe').onclick = () => {
-    Object.assign(settings, { delayMin: 3, delayMax: 6, batchSize: 40, batchPause: 30 });
-    store.set('settings', settings);
-    fillSettings();
-    toast('Қауіпсіз режим қосылды');
   };
   $('minimize').onclick = hidePanel;
   $('fab').onclick = showPanel;
@@ -999,10 +929,8 @@ details[open] summary { margin-bottom: 10px; }
     host.remove();
   };
 
-  $('template').value = store.get('template', '');
+  $('template').value = store.get('template', '') || DEFAULT_TEMPLATE;
   $('msgLen').textContent = $('template').value.length ? $('template').value.length + ' таңба' : '';
-  $('list').value = store.get('manual', '');
-  fillSettings();
   setMode(mode);
   renderPeople();
   if (document.querySelector('#pane-side')) loadLists();

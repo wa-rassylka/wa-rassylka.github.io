@@ -16,7 +16,13 @@ const DEFAULT_SETTINGS = {
     'Сәлем, {аты}! Сен {тапсырмалар}. Ертеңге дейін міндетті түрде тапсыр. ' +
     'Компания ережесі бойынша себепсіз 3 тапсырманы орындамасаң, курсты жалғастыра алмайсың. ' +
     'Барлық мүмкіндік пен материалдар берілген, соларды пайдалан 💪',
+  remindTemplate:
+    'Қайырлы кеш☺️ Еске саламын: балаңыз {оқушы} {тапсырмалар}. ' +
+    'Тапсырманы уақытында орындауын қадағалап жіберсеңіз!',
+  remindStudentTemplate:
+    'Сәлем, {аты}! Еске саламын: сен {тапсырмалар}. Дедлайн өтпей тұрып тапсыруды ұмытпа 💪',
   recipients: 'parents',
+  jmode: 'overdue',
 };
 
 const $ = (id) => document.getElementById(id);
@@ -43,6 +49,7 @@ let settings = { ...DEFAULT_SETTINGS, ...store.get('settings', {}) };
 if (settings.template === OLD_TEMPLATE) settings.template = DEFAULT_SETTINGS.template;
 let auth = store.get('auth', null);
 let lessons = [];
+let allLessons = [];
 let rows = [];
 let found = null;
 
@@ -106,12 +113,38 @@ function tasksPhrase(items, who = 'parent') {
   return `мына тапсырмаларды ${verb}: ${items.map((it, i) => part(it, i === 0)).join(', ')}`;
 }
 
+function timeLeft(deadline) {
+  const mins = Math.max(0, Math.round((parseDeadline(deadline).getTime() - Date.now()) / 60000));
+  const d = Math.floor(mins / 1440);
+  const h = Math.floor((mins % 1440) / 60);
+  const m = mins % 60;
+  const parts = [];
+  if (d) parts.push(`${d} күн`);
+  if (h) parts.push(`${h} сағат`);
+  if (m || !parts.length) parts.push(`${m} минут`);
+  return parts.join(' ');
+}
+
+function shortLeft(deadline) {
+  return timeLeft(deadline).replace(' сағат', ' сағ').replace(' минут', ' мин');
+}
+
+function remindPhrase(items, who = 'parent') {
+  const verb = who === 'student' ? 'әлі тапсырмадың' : 'әлі тапсырмаған';
+  const part = (it) => `${prettyLessonName(it.name)} (дедлайнға ${it.left} қалды)`;
+  if (items.length === 1) return `мына тапсырманы ${verb}: ${part(items[0])}`;
+  return `мына тапсырмаларды ${verb}: ${items.map(part).join(', ')}`;
+}
+
 function renderMessage(r) {
-  const template = r.who === 'student' ? settings.studentTemplate : settings.template;
+  const remind = r.mode === 'remind';
+  const template = remind
+    ? (r.who === 'student' ? settings.remindStudentTemplate : settings.remindTemplate)
+    : (r.who === 'student' ? settings.studentTemplate : settings.template);
   return template
     .replaceAll('{оқушы}', `${r.lastname} ${r.firstname}`.trim())
     .replaceAll('{аты}', r.firstname.split(' ')[0] || r.lastname)
-    .replaceAll('{тапсырмалар}', tasksPhrase(r.items, r.who));
+    .replaceAll('{тапсырмалар}', remind ? remindPhrase(r.items, r.who) : tasksPhrase(r.items, r.who));
 }
 
 function recipientList() {
@@ -231,10 +264,7 @@ async function loadLessons() {
     })
   );
 
-  const now = Date.now();
-  lessons = all
-    .filter((l) => l.deadline && parseDeadline(l.deadline).getTime() < now)
-    .sort((a, b) => parseDeadline(b.deadline) - parseDeadline(a.deadline));
+  allLessons = all.filter((l) => l.deadline);
   renderLessons();
   setStatus('');
 }
@@ -243,9 +273,16 @@ function renderLessons() {
   const box = $('lessons');
   box.innerHTML = '';
   const showAll = $('showAll').checked;
-  const visible = lessons.filter((l) => showAll || daysLate(l.deadline) <= RECENT_DAYS);
+  const remind = settings.jmode === 'remind';
+  const now = Date.now();
+  lessons = remind
+    ? allLessons.filter((l) => parseDeadline(l.deadline).getTime() > now).sort((a, b) => parseDeadline(a.deadline) - parseDeadline(b.deadline))
+    : allLessons.filter((l) => parseDeadline(l.deadline).getTime() < now).sort((a, b) => parseDeadline(b.deadline) - parseDeadline(a.deadline));
+  $('showAllLabel').textContent = remind ? 'Алыстағылары' : 'Ескілері';
+  $('findLabel').textContent = remind ? 'Әлі тапсырмағандарды табу' : 'Тапсырмағандарды табу';
+  const visible = lessons.filter((l) => showAll || (remind ? parseDeadline(l.deadline).getTime() - now <= 7 * DAY_MS : daysLate(l.deadline) <= RECENT_DAYS));
   if (!visible.length) {
-    box.append(el('div', 'empty', 'Дедлайны өткен тапсырма жоқ.'));
+    box.append(el('div', 'empty', remind ? 'Алдағы 7 күнде дедлайны бар тапсырма жоқ.' : 'Дедлайны өткен тапсырма жоқ.'));
     return;
   }
   visible.forEach((l, i) => {
@@ -259,7 +296,12 @@ function renderLessons() {
     const tick = el('span', 'tick');
     tick.append(icon('check'));
     const badges = el('div', 'badges');
-    badges.append(el('span', 'chip ' + (days <= 2 ? 'warn' : ''), days <= 0 ? 'бүгін' : `${days} күн бұрын`));
+    if (remind) {
+      const soon = parseDeadline(l.deadline).getTime() - now < DAY_MS;
+      badges.append(el('span', 'chip ' + (soon ? 'warn' : 'brand'), `қалды: ${shortLeft(l.deadline)}`));
+    } else {
+      badges.append(el('span', 'chip ' + (days <= 2 ? 'warn' : ''), days <= 0 ? 'бүгін' : `${days} күн бұрын`));
+    }
     if (l.notSubmittedCount != null) {
       badges.append(el('span', 'chip ' + (l.notSubmittedCount ? 'fail' : 'ok'), `тапсырмаған: ${l.notSubmittedCount}`));
     }
@@ -297,29 +339,30 @@ async function findStudents() {
         items: [],
       };
       if (LEFT_COMMENT_RE.test(comments)) entry.left = true;
-      entry.items.push({ id: l.id, name: l.name, days: daysLate(l.deadline) });
+      entry.items.push({ id: l.id, name: l.name, days: daysLate(l.deadline), left: timeLeft(l.deadline), short: shortLeft(l.deadline) });
       map.set(p.studentId, entry);
     }
   }
 
-  found = { groupId, byId, entries: [...map.values()].sort((a, b) => a.lastname.localeCompare(b.lastname, 'kk')) };
+  found = { groupId, byId, mode: settings.jmode, entries: [...map.values()].sort((a, b) => a.lastname.localeCompare(b.lastname, 'kk')) };
   buildRows();
   setStatus('');
 }
 
 function buildRows() {
   if (!found) return;
-  const { groupId, byId, entries } = found;
+  const { groupId, byId, entries, mode } = found;
   const previous = new Map(rows.map((r) => [r.key, r]));
   rows = [];
   for (const e of entries) {
     const s = byId.get(e.studentId) || {};
     for (const who of recipientList()) {
-      const key = sentKey(groupId, e.studentId, e.items) + (who === 'student' ? '|student' : '');
+      const key = sentKey(groupId, e.studentId, e.items) + (who === 'student' ? '|student' : '') + (mode === 'remind' ? '|remind' : '');
       const row = {
         ...e,
         who,
         key,
+        mode,
         phone: normPhone(who === 'student' ? s.phoneNumber : s.parentPhoneNumber),
         checked: !e.left,
         note: e.left ? 'шыққан оқушы (пікірі бойынша)' : '',
@@ -404,7 +447,7 @@ function renderPreview() {
     tdName.append(who);
 
     const tdTasks = el('td', 'tasks');
-    for (const it of r.items) tdTasks.append(el('span', 'chip brand', `${prettyLessonName(it.name)} · ${it.days} күн`));
+    for (const it of r.items) tdTasks.append(el('span', 'chip ' + (r.mode === 'remind' ? 'warn' : 'brand'), r.mode === 'remind' ? `${prettyLessonName(it.name)} · ${it.short} қалды` : `${prettyLessonName(it.name)} · ${it.days} күн`));
 
     const tdMsg = el('td', 'msg');
     const ta = el('textarea');
@@ -482,6 +525,10 @@ function fillSettings() {
   $('method').value = settings.method;
   $('template').value = settings.template;
   $('studentTemplate').value = settings.studentTemplate;
+  $('remindTemplate').value = settings.remindTemplate;
+  $('remindStudentTemplate').value = settings.remindStudentTemplate;
+  const jm = document.querySelector(`input[name="jmode"][value="${settings.jmode}"]`);
+  if (jm) jm.checked = true;
   const radio = document.querySelector(`input[name="recipients"][value="${settings.recipients}"]`);
   if (radio) radio.checked = true;
 }
@@ -494,6 +541,8 @@ function saveSettings() {
     method: $('method').value,
     template: $('template').value.trim() || DEFAULT_SETTINGS.template,
     studentTemplate: $('studentTemplate').value.trim() || DEFAULT_SETTINGS.studentTemplate,
+    remindTemplate: $('remindTemplate').value.trim() || DEFAULT_SETTINGS.remindTemplate,
+    remindStudentTemplate: $('remindStudentTemplate').value.trim() || DEFAULT_SETTINGS.remindStudentTemplate,
   };
   store.set('settings', settings);
   for (const r of rows) r.message = renderMessage(r);
@@ -555,7 +604,19 @@ $('saveSettings').onclick = saveSettings;
 $('resetTemplate').onclick = () => {
   $('template').value = DEFAULT_SETTINGS.template;
   $('studentTemplate').value = DEFAULT_SETTINGS.studentTemplate;
+  $('remindTemplate').value = DEFAULT_SETTINGS.remindTemplate;
+  $('remindStudentTemplate').value = DEFAULT_SETTINGS.remindStudentTemplate;
 };
+document.querySelectorAll('input[name="jmode"]').forEach((radio) => {
+  radio.onchange = () => {
+    settings.jmode = radio.value;
+    store.set('settings', settings);
+    rows = [];
+    found = null;
+    renderPreview();
+    renderLessons();
+  };
+});
 document.querySelectorAll('input[name="recipients"]').forEach((radio) => {
   radio.onchange = () => {
     settings.recipients = radio.value;

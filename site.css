@@ -656,3 +656,6 @@ a.logo { text-decoration: none; }
 .login-brand { display: flex; justify-content: center; margin: 4px 0 6px; color: #ffffff; }
 .login-brand .juz-logo { width: 170px; height: auto; filter: drop-shadow(0 8px 24px rgba(37, 211, 102, .25)); }
 @media (prefers-color-scheme: light) { .login-brand { color: #285b6e; } }
+
+.segmented.jmode { margin-bottom: 12px; }
+.switch b { font-weight: inherit; }

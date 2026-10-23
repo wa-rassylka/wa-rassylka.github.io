@@ -75,7 +75,11 @@
       <section class="card step" style="--i:1">
         <div class="step-head">
           <span class="num">2</span><h2>Тапсырмалар</h2>
-          <label class="switch"><input type="checkbox" id="showAll"><span></span>Ескілері</label>
+          <label class="switch"><input type="checkbox" id="showAll"><span></span><b id="showAllLabel">Ескілері</b></label>
+        </div>
+        <div class="segmented jmode">
+          <label><input type="radio" name="jmode" value="overdue" checked><span>Тапсырмағандар</span></label>
+          <label><input type="radio" name="jmode" value="remind"><span>Еске салу</span></label>
         </div>
         <div id="lessons" class="lesson-grid"></div>
         <div class="field-label">Кімге жіберу</div>
@@ -84,7 +88,7 @@
           <label><input type="radio" name="recipients" value="students"><span>Оқушыға</span></label>
           <label><input type="radio" name="recipients" value="both"><span>Екеуіне</span></label>
         </div>
-        <button id="findStudents" class="primary wide"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Тапсырмағандарды табу</button>
+        <button id="findStudents" class="primary wide"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span id="findLabel">Тапсырмағандарды табу</span></button>
       </section>
 
       <details class="card" style="--i:2">
@@ -108,6 +112,12 @@
           </label>
           <label>Оқушыға хабарлама үлгісі <span class="hint"><code>{оқушы}</code> <code>{аты}</code> <code>{тапсырмалар}</code></span>
             <textarea id="studentTemplate" rows="5"></textarea>
+          </label>
+          <label>Еске салу — ата-анаға <span class="hint"><code>{оқушы}</code> <code>{аты}</code> <code>{тапсырмалар}</code></span>
+            <textarea id="remindTemplate" rows="4"></textarea>
+          </label>
+          <label>Еске салу — оқушыға <span class="hint"><code>{оқушы}</code> <code>{аты}</code> <code>{тапсырмалар}</code></span>
+            <textarea id="remindStudentTemplate" rows="4"></textarea>
           </label>
           <div class="grid2">
             <button id="resetTemplate" class="ghost" type="button">Үлгіні қалпына келтіру</button>

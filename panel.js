@@ -140,9 +140,9 @@
     const head = compact(text).slice(0, 30);
     for (let i = 0; i < 80; i++) {
       await sleep(75);
-      const rows = document.querySelectorAll('#main [role="row"]');
-      const last = rows[rows.length - 1];
-      if (!getCompose()?.innerText.trim() && last && compact(last.innerText).includes(head) && rows.length >= rowsBefore) return { ok: true };
+      const rows = [...document.querySelectorAll('#main [role="row"]')];
+      const recent = rows.slice(-5).some((r) => compact(r.innerText).includes(head));
+      if (!getCompose()?.innerText.trim() && recent && rows.length >= rowsBefore) return { ok: true };
     }
     return { ok: false, reason: 'жіберілгені расталмады — чатты тексеріңіз' };
   }

@@ -24,24 +24,27 @@
     for (let i = 0; i < 10 && !matches.length; i++) {
       await sleep(600);
       const seen = new Set();
-      matches = [...document.querySelectorAll('#pane-side span[title]')].filter((el) => {
-        const t = el.getAttribute('title');
-        if (seen.has(t)) return false;
-        seen.add(t);
-        return fits(t);
-      });
+      matches = resultRows().filter((m) => {
+        if (seen.has(m.title)) return false;
+        seen.add(m.title);
+        return fits(m.title);
+      }).map((m) => m.el);
     }
     if (!matches.length) return { ok: false, reason: 'контакт табылмады' };
     const pick = (prefer && matches.find((el) => norm(el.getAttribute('title')).includes(norm(prefer)))) || matches[0];
     if (matches.length > 1 && !(prefer && norm(pick.getAttribute('title')).includes(norm(prefer)))) {
       return { ok: false, reason: 'бірнеше контакт сәйкес келді: ' + matches.map((m) => m.getAttribute('title')).join(' / ') };
     }
-    clickRow(pick.closest('[role="listitem"], [role="row"], [role="gridcell"]') || pick);
+    const pickTitle = pick.getAttribute('title').trim();
+    clickRow(pick.closest('[role="gridcell"]') || pick.closest('[role="listitem"], [role="row"]') || pick);
     for (let i = 0; i < 40; i++) {
       await sleep(150);
-      const header = document.querySelector('#main header');
       const compose = document.querySelector('#main footer [contenteditable="true"]');
-      if (header && compose && fits(header.innerText)) return { ok: true, title: pick.getAttribute('title') };
+      if (compose && norm(chatTitle()) === norm(pickTitle)) {
+        await sleep(250);
+        if (isGroupChat()) return { ok: false, reason: 'бұл топ чаты — жіберілмеді' };
+        return { ok: true, title: pickTitle };
+      }
     }
     return { ok: false, reason: 'чат ашылмады немесе басқа чат ашылды' };
   }
@@ -73,23 +76,61 @@
   }
 
   async function waOpenByPhone(digits) {
-    const header0 = (document.querySelector('#main header')?.innerText || '').split('\n')[0];
     if (!(await waSearch('+' + digits))) return { ok: false, reason: 'WhatsApp іздеу жолы табылмады' };
-    let row = null;
-    for (let i = 0; i < 12 && !row; i++) {
+    let found = [];
+    for (let i = 0; i < 12 && !found.length; i++) {
       await sleep(500);
-      row = [...document.querySelectorAll('#pane-side [role="row"], #pane-side [role="listitem"]')].find((r) => r.querySelector('span[title]'));
+      found = resultRows();
     }
-    if (!row) return { ok: false, reason: 'нөмір бойынша контакт табылмады' };
-    const title = row.querySelector('span[title]').getAttribute('title');
-    clickRow(row.querySelector('span[title]').closest('[role="gridcell"]') || row);
+    if (!found.length) return { ok: false, reason: 'нөмір бойынша жеке чат табылмады' };
+    if (found.length > 1) return { ok: false, reason: 'нөмір бойынша бірнеше чат шықты: ' + found.map((f) => f.title).join(' / ') };
+    const { el, title } = found[0];
+    clickRow(el.closest('[role="gridcell"]') || el.closest('[role="row"], [role="listitem"]') || el);
     for (let i = 0; i < 40; i++) {
       await sleep(150);
-      const header = (document.querySelector('#main header')?.innerText || '').split('\n')[0];
       const compose = document.querySelector('#main footer [contenteditable="true"]');
-      if (compose && header && (norm(header).includes(norm(title)) || header !== header0)) return { ok: true, title: header.trim() };
+      if (compose && norm(chatTitle()) === norm(title)) {
+        await sleep(250);
+        if (isGroupChat()) return { ok: false, reason: 'бұл топ чаты — жіберілмеді' };
+        return { ok: true, title };
+      }
     }
     return { ok: false, reason: 'нөмір бойынша чат ашылмады' };
+  }
+
+
+  function chatTitle() {
+    const h = document.querySelector('#main header');
+    if (!h) return '';
+    const t = h.querySelector('span[title][dir="auto"]') || h.querySelector('span[dir="auto"]');
+    return ((t && (t.getAttribute('title') || t.textContent)) || h.innerText.split('\n')[0] || '').trim();
+  }
+
+  function isGroupChat() {
+    const main = document.querySelector('#main');
+    if (!main) return false;
+    if (main.querySelector('[data-id*="@g.us"]')) return true;
+    const h = main.querySelector('header');
+    const lines = (h ? h.innerText : '').split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.some((l) => /данные группы|данных группы|group info|топ туралы/i.test(l))) return true;
+    if (lines.slice(1).some((l) => /^(Вы|You|Сіз),\s/.test(l) || l.split(',').length >= 3)) return true;
+    return false;
+  }
+
+  function resultRows() {
+    const out = [];
+    let inGroups = false;
+    for (const r of document.querySelectorAll('#pane-side [role="row"], #pane-side [role="listitem"]')) {
+      const t = r.querySelector('span[title][dir="auto"]');
+      if (!t) {
+        const label = r.innerText.trim();
+        if (label) inGroups = /групп|group|топ/i.test(label);
+        continue;
+      }
+      if (inGroups) continue;
+      out.push({ row: r, title: t.getAttribute('title').trim(), el: t });
+    }
+    return out;
   }
 
   function clickRow(target) {
@@ -100,10 +141,12 @@
 
   async function waSendInOpenChat(text, expectHeader, startsWith = false) {
     const headerOk = () => {
-      const h = document.querySelector('#main header');
+      if (isGroupChat()) return false;
       if (!expectHeader) return true;
-      return !!h && (startsWith ? norm(h.innerText).startsWith(norm(expectHeader)) : norm(h.innerText).includes(norm(expectHeader)));
+      const t = norm(chatTitle());
+      return !!t && (startsWith ? t.startsWith(norm(expectHeader)) : t.includes(norm(expectHeader)));
     };
+    if (isGroupChat()) return { ok: false, reason: 'бұл топ чаты — жіберілмеді' };
     const getCompose = () => document.querySelector('#main footer [contenteditable="true"]');
     const clear = (el) => {
       el.focus();
@@ -265,9 +308,10 @@
     clickRow((titleEl && titleEl.closest('[role="gridcell"]')) || row);
     for (let i = 0; i < 80; i++) {
       await sleep(75);
-      const header = document.querySelector('#main header');
       const compose = document.querySelector('#main footer [contenteditable="true"]');
-      if (header && norm(header.innerText).includes(norm(title))) {
+      if (norm(chatTitle()) === norm(title)) {
+        await sleep(250);
+        if (isGroupChat()) return { ok: false, reason: 'бұл топ чаты — жіберілмеді' };
         return compose ? { ok: true } : { ok: false, reason: 'бұл чатқа жазу мүмкін емес' };
       }
     }
@@ -794,7 +838,7 @@ input[type=checkbox]:checked::after { transform: translateY(-1px) rotate(45deg) 
       const opened = await waOpenByPhone(r.target);
       if (!opened.ok) return opened;
       if (dry) return { ok: true, via: `«${opened.title}»` };
-      return { ...(await waSendInOpenChat(r.message, null)), via: `«${opened.title}»` };
+      return { ...(await waSendInOpenChat(r.message, opened.title)), via: `«${opened.title}»` };
     }
     let res = { ok: false, reason: 'контакт та, нөмір де жоқ' };
     if (r.contact && r.method !== 'phone-only') {
@@ -811,7 +855,7 @@ input[type=checkbox]:checked::after { transform: translateY(-1px) rotate(45deg) 
       if (!opened.ok) return { ok: false, reason: r.contact ? `${first}; ${opened.reason}` : opened.reason };
       const via = `нөмір ${'…' + r.phone.slice(-4)}`;
       if (dry) return { ok: true, via };
-      return { ...(await waSendInOpenChat(r.message, null)), via };
+      return { ...(await waSendInOpenChat(r.message, opened.title)), via };
     }
     return res;
   }

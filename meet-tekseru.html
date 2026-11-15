@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Мит тексеру</title>
+  <meta name="description" content="Ноутбукке арналған бағдарлама: Meet түгендеу, камера, шыққан оқушыға WhatsApp, Telegram хабарлама.">
+  <link rel="icon" href="meet-tekseru.png" type="image/png">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .app-logo { width: 104px; height: 104px; margin: 0 auto 22px; display: block; filter: drop-shadow(0 22px 40px rgba(47, 127, 134, .55)); animation: floaty 5s ease-in-out infinite; }
+    .dl { display: grid; gap: 12px; max-width: 560px; margin: 0 auto; }
+    .dl a { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 20px; border-radius: 16px; text-decoration: none; color: inherit; background: var(--field); border: 1px solid var(--field-border); font-weight: 700; text-align: left; transition: transform .15s, box-shadow .15s; }
+    .dl a:hover { transform: translateY(-1px); }
+    .dl a small { font-weight: 500; color: var(--muted); }
+    .dl a.mine { color: #fff; border-color: transparent; background: linear-gradient(135deg, var(--brand-2), var(--brand) 55%, #018a6d); box-shadow: 0 16px 36px -10px rgba(0, 168, 132, .8); }
+    .dl a.mine small { color: rgba(255, 255, 255, .85); }
+    .dl .tag { font-size: 12px; padding: 3px 8px; border-radius: 999px; background: rgba(255, 255, 255, .22); }
+    .dl a:not(.mine) .tag { display: none; }
+    .guide { max-width: 760px; margin: 0 auto; }
+    .guide ol { margin: 8px 0 0; padding-left: 22px; line-height: 1.7; color: var(--muted); }
+    .guide b { color: var(--text, inherit); }
+    .guide h3 { margin: 0 0 4px; }
+    .os-note { margin-top: 14px; font-size: 13.5px; }
+  </style>
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <main class="landing">
+    <section class="hero">
+      <img class="app-logo" src="meet-tekseru.png" alt="">
+      <h1>Мит <em>тексеру</em></h1>
+      <p>Ноутбукке арналған бағдарлама: Meet-те оқушыларды түгендейді, кестеге белгілейді, камерасын тексереді. Оқушы шығып кетсе — телефоныңызға Telegram хабар келеді, оқушының өзіне WhatsApp-қа «қайта кірейік» деп жазады.</p>
+    </section>
+
+    <section class="card install">
+      <h2>Жүктеп алу</h2>
+      <p class="hint">Компьютеріңізге сәйкесін таңдаңыз. Алдымен <a href="https://www.google.com/chrome/" target="_blank" rel="noopener">Google Chrome</a> орнатылған болуы керек.</p>
+      <div class="dl">
+        <a id="dl-mac-arm" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-mac-arm64.dmg">
+          <span>Mac — Apple M1 / M2 / M3 / M4<br><small>MeetTekseru-mac-arm64.dmg · 115 МБ</small></span><span class="tag">сіздің компьютер</span></a>
+        <a id="dl-mac-intel" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-mac-x64.dmg">
+          <span>Mac — Intel<br><small>MeetTekseru-mac-x64.dmg · 119 МБ</small></span><span class="tag">сіздің компьютер</span></a>
+        <a id="dl-win" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-win-x64.exe">
+          <span>Windows 10 / 11<br><small>MeetTekseru-win-x64.exe · 116 МБ</small></span><span class="tag">сіздің компьютер</span></a>
+      </div>
+      <p id="osNote" class="hint os-note">Mac-та процессорды білу үшін:  → «Об этом Mac» → «Чип»: Apple M… болса — бірінші, Intel болса — екінші.</p>
+    </section>
+
+    <div class="section-title">Орнату</div>
+    <section class="steps">
+      <div class="card"><span class="num">1</span><h3>Mac</h3><p>.dmg файлын ашып, «Мит тексеру» белгісін <b>Applications</b> папкасына сүйреңіз. Бірінші ашқанда Mac тоқтатса: <b>Системные настройки → Конфиденциальность и безопасность → «Всё равно открыть»</b>.</p></div>
+      <div class="card"><span class="num">2</span><h3>Windows</h3><p>.exe файлын ашыңыз. «Windows защитил ваш компьютер» шықса: <b>Подробнее → Выполнить в любом случае</b>. Жұмыс үстелінде белгісі пайда болады.</p></div>
+      <div class="card"><span class="num">3</span><h3>Бір реттік баптау</h3><p>Кестені <b>bajburinovasylmurat@gmail.com</b>-мен Редактор ретінде бөлісіп, «Баптаулар»-ға сілтемесін қойыңыз. «Сабаққа кіру» басқанда ашылған Chrome терезесінде Google-ға кіріп, WhatsApp QR-кодын сканерлеңіз. Telegram-ды қосыңыз.</p></div>
+    </section>
+
+    <div class="section-title">Сабақта</div>
+    <section class="card guide">
+      <ol>
+        <li>Бағдарламаны ашып, мит сілтемесін қойыңыз → <b>Сабаққа кіру</b>. Meet пен WhatsApp бөлек Chrome терезелерінде ашылады — Meet-ке кәдімгідей қосылыңыз.</li>
+        <li><b>Қатысу</b> — митте барларды кестеде белгілейді. <b>Камераны тексеру</b> — кімнің камерасы өшік екенін көрсетеді.</li>
+        <li><b>Бақылау</b>-ды қосыңыз: әр минут сайын тексереді, шыққан оқушыға WhatsApp-қа өзі жазады, сізге Telegram-ға хабар келеді. Топқа, ата-анаға ешқашан жазбайды.</li>
+        <li>WhatsApp-та оқушы контактілері <b>тегінен басталсын</b>: «🦋 ЕРМЕКБАЙ АЛИШЕР | МАТ-21».</li>
+        <li>Сабақ кезінде бағдарламаны да, Chrome терезелерін де жаппаңыз (кішірейтіп қоюға болады).</li>
+      </ol>
+    </section>
+  </main>
+
+  <script>
+    (async () => {
+      const ua = navigator.userAgent;
+      let pick = null;
+      if (/Windows/.test(ua)) pick = 'dl-win';
+      else if (/Macintosh/.test(ua)) {
+        try {
+          const d = navigator.userAgentData && (await navigator.userAgentData.getHighEntropyValues(['architecture']));
+          if (d && d.architecture) pick = d.architecture === 'arm' ? 'dl-mac-arm' : 'dl-mac-intel';
+        } catch {}
+      }
+      if (!pick) return;
+      const a = document.getElementById(pick);
+      a.classList.add('mine');
+      a.parentNode.prepend(a);
+      if (pick !== 'dl-win') document.getElementById('osNote').textContent = 'Компьютеріңіз анықталды — жасыл батырманы басыңыз.';
+      else document.getElementById('osNote').remove();
+    })();
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Мит тексеру</title>
-  <meta name="description" content="Ноутбукке арналған бағдарлама: Meet түгендеу, камера, шыққан оқушыға WhatsApp, Telegram хабарлама.">
+  <meta name="description" content="Meet түгендеу Telegram-нан: сабақты бастау, қатысу, камера, шыққан оқушыға WhatsApp.">
   <link rel="icon" href="meet-tekseru.png" type="image/png">
   <link rel="stylesheet" href="site.css">
   <style>
@@ -22,6 +22,7 @@
     .guide b { color: var(--text, inherit); }
     .guide h3 { margin: 0 0 4px; }
     .os-note { margin-top: 14px; font-size: 13.5px; }
+    .tag-rec { font-size: 12px; vertical-align: middle; padding: 3px 9px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); }
   </style>
 </head>
 <body>
@@ -31,40 +32,45 @@
     <section class="hero">
       <img class="app-logo" src="meet-tekseru.png" alt="">
       <h1>Мит <em>тексеру</em></h1>
-      <p>Ноутбукке арналған бағдарлама: Meet-те оқушыларды түгендейді, кестеге белгілейді, камерасын тексереді. Оқушы шығып кетсе — телефоныңызға Telegram хабар келеді, оқушының өзіне WhatsApp-қа «қайта кірейік» деп жазады. Бәрін Telegram боттан да басқаруға болады.</p>
+      <p>Сабақты түгендеу <b>Telegram-нан</b>: ботқа «Сабақты бастау» дейсіз — платформадан митіңізді тауып ашады, кім бар/кім жоқ, кімнің камерасы өшік, кім шығып кетті — бәрі телефоныңызға келеді, шыққан оқушыға WhatsApp-қа «қайта кірейік» деп өзі жазады.</p>
     </section>
 
     <section class="card install">
-      <h2>Жүктеп алу</h2>
-      <p class="hint">Компьютеріңізге сәйкесін таңдаңыз. Алдымен <a href="https://www.google.com/chrome/" target="_blank" rel="noopener">Google Chrome</a> орнатылған болуы керек.</p>
+      <h2>Chrome кеңейтімі <span class="tag-rec">ұсынылады</span></h2>
+      <p class="hint">Бір рет орнатасыз — қалғаны Telegram ботта. Mac пен Windows-та бірдей.</p>
       <div class="dl">
-        <a id="dl-mac-arm" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-mac-arm64.dmg">
-          <span>Mac — Apple M1 / M2 / M3 / M4<br><small>MeetTekseru-mac-arm64.dmg · 114 МБ</small></span><span class="tag">сіздің компьютер</span></a>
-        <a id="dl-mac-intel" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-mac-x64.dmg">
-          <span>Mac — Intel<br><small>MeetTekseru-mac-x64.dmg · 121 МБ</small></span><span class="tag">сіздің компьютер</span></a>
-        <a id="dl-win" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-win-x64.exe">
-          <span>Windows 10 / 11<br><small>MeetTekseru-win-x64.exe · 116 МБ</small></span><span class="tag">сіздің компьютер</span></a>
+        <a class="mine" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/meet-tekseru.zip"><span>meet-tekseru.zip<br><small>Chrome кеңейтімі · 50 КБ</small></span><span class="tag">жүктеу</span></a>
       </div>
-      <p id="osNote" class="hint os-note">Mac-та процессорды білу үшін:  → «Об этом Mac» → «Чип»: Apple M… болса — бірінші, Intel болса — екінші.</p>
     </section>
 
-    <div class="section-title">Орнату</div>
+    <div class="section-title">Орнату (бір рет, 3 минут)</div>
     <section class="steps">
-      <div class="card"><span class="num">1</span><h3>Mac</h3><p>.dmg файлын ашып, «Мит тексеру» белгісін <b>Applications</b> папкасына сүйреңіз. Бірінші ашқанда «не удалось проверить» деп шықса — <b>Готово</b> басып, <b>Системные настройки → Конфиденциальность и безопасность</b> → төменде <b>«Всё равно открыть»</b>. Ертерек жүктеген болсаңыз және «повреждено» шықса — қайта жүктеңіз немесе Терминалда: <code>xattr -cr "/Applications/Мит тексеру.app"</code></p></div>
-      <div class="card"><span class="num">2</span><h3>Windows</h3><p>.exe файлын ашыңыз. «Windows защитил ваш компьютер» шықса: <b>Подробнее → Выполнить в любом случае</b>. Жұмыс үстелінде белгісі пайда болады.</p></div>
-      <div class="card"><span class="num">3</span><h3>Бір реттік баптау</h3><p>Кестені <b>bajburinovasylmurat@gmail.com</b>-мен Редактор ретінде бөлісіп, «Баптаулар»-ға сілтемесін қойыңыз. «Сабаққа кіру» басқанда ашылған Chrome терезесінде Google-ға кіріп, WhatsApp QR-кодын сканерлеңіз. Telegram-ды қосыңыз.</p></div>
+      <div class="card"><span class="num">1</span><h3>Кеңейтім</h3><p>Zip-ті ашыңыз (<b>meet-tekseru</b> папкасы шығады). Chrome-да <b>chrome://extensions</b> → оң жақта <b>Developer mode</b> → <b>Load unpacked</b> → сол папка.</p></div>
+      <div class="card"><span class="num">2</span><h3>Telegram</h3><p>Орнатқанда бет өзі ашылады → <b>«Telegram-ды қосу»</b> → ботта <b>Start</b>. Одан кейін кеңейтім бетін ашудың керегі жоқ.</p></div>
+      <div class="card"><span class="num">3</span><h3>Кірулер</h3><p>Осы Chrome-да <b>juz40-edu.kz</b>-ке куратор аккаунтыңызбен кіріңіз (тізім, сабақ, мит, телефондар сол жерден) және <b>web.whatsapp.com</b>-ды QR-кодпен ашыңыз.</p></div>
     </section>
 
-    <div class="section-title">Сабақта</div>
+    <div class="section-title">Сабақта — бәрі ботта</div>
     <section class="card guide">
       <ol>
-        <li>Бағдарламаны ашып, мит сілтемесін қойыңыз → <b>Сабаққа кіру</b>. Meet пен WhatsApp бөлек Chrome терезелерінде ашылады — Meet-ке кәдімгідей қосылыңыз.</li>
-        <li><b>Қатысу</b> — митте барларды кестеде белгілейді. <b>Камераны тексеру</b> — кімнің камерасы өшік екенін көрсетеді.</li>
-        <li><b>Бақылау</b>-ды қосыңыз: әр минут сайын тексереді, шыққан оқушыға WhatsApp-қа өзі жазады, сізге Telegram-ға хабар келеді. Топқа, ата-анаға ешқашан жазбайды.</li>
-        <li><b>Telegram</b>-ды қосқан соң @meetkhabar_bot-та <b>📋 Қатысу</b>, <b>📷 Камера</b>, <b>▶️ Бақылау</b>, <b>📊 Кім жоқ</b> батырмалары шығады — тексеруді телефоннан басқарасыз (ноутбук пен бағдарлама қосулы тұрсын). Шыққан оқушының хабарының астында <b>✉️</b> батырмасы — ватсапқа қайта жазады.</li>
-        <li>WhatsApp-та оқушы контактілері <b>тегінен басталсын</b>: «🦋 ЕРМЕКБАЙ АЛИШЕР | МАТ-21».</li>
-        <li>Сабақ кезінде бағдарламаны да, Chrome терезелерін де жаппаңыз (кішірейтіп қоюға болады).</li>
+        <li><b>🎓 Сабақты бастау</b> — платформадан қазіргі сабағыңыздың митін тауып, компьютерде ашады. Сол жерде «Присоединиться» басасыз.</li>
+        <li><b>📋 Қатысу</b> — Meet-тегі аттар тізіммен салыстырылады + платформаның пошта бойынша есебі: кім қатысты, белсенділігі шектен төмен кім.</li>
+        <li><b>▶️ Бақылау</b> — әр минут сайын: шыққан оқушы туралы хабар келеді, оқушыға WhatsApp-қа өзі жазады. Хабардың астында <b>✉️ қайта жазу</b> және <b>📱 телефоннан</b> батырмалары.</li>
+        <li><b>📷 Камера</b>, <b>📊 Кім жоқ</b>, <b>⏹ Тоқтату</b>.</li>
+        <li><b>⚙️ Баптаулар</b> — тізім әдепкіде платформадан. Кестеге белгі керек болса — кесте сілтемесін жіберіңіз: кестеде <b>«Доступ → Все, у кого есть ссылка → Редактор»</b> болса жеткілікті. WhatsApp-қа жазуды қосу/өшіру.</li>
+        <li>Сабақ кезінде компьютер мен Chrome қосулы тұрсын (Meet, WhatsApp Web, JUZ40 ашық).</li>
       </ol>
+    </section>
+
+    <div class="section-title">Немесе: бөлек бағдарлама</div>
+    <section class="card install">
+      <p class="hint">Кеңейтім орната алмасаңыз — дәл осы жүйе, бөлек бағдарлама ретінде (Chrome қажет). Mac-та бірінші ашқанда: <b>Системные настройки → Конфиденциальность и безопасность → «Всё равно открыть»</b>; Windows-та: <b>Подробнее → Выполнить в любом случае</b>.</p>
+      <div class="dl">
+        <a id="dl-mac-arm" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-mac-arm64.dmg"><span>Mac — Apple M1 / M2 / M3 / M4<br><small>.dmg · 114 МБ</small></span><span class="tag">сіздің компьютер</span></a>
+        <a id="dl-mac-intel" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-mac-x64.dmg"><span>Mac — Intel<br><small>.dmg · 121 МБ</small></span><span class="tag">сіздің компьютер</span></a>
+        <a id="dl-win" href="https://github.com/wa-rassylka/wa-rassylka.github.io/releases/latest/download/MeetTekseru-win-x64.exe"><span>Windows 10 / 11<br><small>.exe · 116 МБ</small></span><span class="tag">сіздің компьютер</span></a>
+      </div>
+      <p id="osNote" class="hint os-note"></p>
     </section>
   </main>
 
@@ -81,10 +87,8 @@
       }
       if (!pick) return;
       const a = document.getElementById(pick);
-      a.classList.add('mine');
       a.parentNode.prepend(a);
-      if (pick !== 'dl-win') document.getElementById('osNote').textContent = 'Компьютеріңіз анықталды — жасыл батырманы басыңыз.';
-      else document.getElementById('osNote').remove();
+      a.querySelector('.tag').style.display = 'inline';
     })();
   </script>
 </body>

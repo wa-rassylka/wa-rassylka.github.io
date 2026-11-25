@@ -138,7 +138,7 @@ const THEMES = [
 const DEFAULT_TEXT = {
   name:'Sauirbay Islam',
   desc:'7-ай 2-апта бойынша асқан білімпаздығымен көзге түсіп, жалпы рейтинг бойынша үздік нәтиже көрсетіп, **ГЕОГРАФИЯ** және **МАТЕМАТИКА** пәндерінен **ТОП-1** болғаны үшін марапатталады',
-  badge:'GENIUS  |  2026',
+  badge:'SMART  |  2026',
   title:'CERTIFICATE',
   values:'Ниет, Адалдық, Жауапкершілік, Еңбекқорлық',
   left:'ASL',
@@ -160,6 +160,7 @@ const state = {
   img: null,          // HTMLImageElement in use
   custom: false,      // user-uploaded image
 };
+if (state.text.badge === "GENIUS  |  2026") state.text.badge = DEFAULT_TEXT.badge;
 
 /* ---------- prompt ---------- */
 let FIGMA = [];

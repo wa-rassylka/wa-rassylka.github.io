@@ -3,72 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Gemini үлгілері</title>
+<title>Промпттар</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0e0f12; --panel:#16181d; --panel2:#1d2027; --line:#2a2e37; --text:#eceef2; --muted:#8d93a0;
-    --accent:#f2b544; --accent-ink:#1a1405;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%}
-  body{background:var(--bg);color:var(--text);font:14px/1.45 Montserrat,system-ui,sans-serif}
-  .app{display:grid;grid-template-columns:330px 1fr;height:100vh}
-  aside{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:18px 16px 40px}
-  main{overflow:auto;padding:22px}
-  h1{font-size:18px;margin:0 0 4px}
-  .sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
-  .nav{display:grid;grid-template-columns:1fr 1fr;background:#0f1115;border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:14px}
-  .nav a{color:var(--muted);text-decoration:none;text-align:center;padding:8px;border-radius:7px;font-weight:700;font-size:13px}
-  .nav a.on{background:var(--accent);color:var(--accent-ink)}
-  .list{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-  .card{border:2px solid transparent;border-radius:11px;overflow:hidden;background:#000;cursor:pointer;padding:0;text-align:left;color:#fff;font:inherit;position:relative;aspect-ratio:3/4}
-  .card img{width:100%;height:100%;object-fit:cover;display:block}
-  .card span{position:absolute;left:0;right:0;bottom:0;padding:18px 7px 6px;font-size:11.5px;font-weight:700;background:linear-gradient(transparent,rgba(0,0,0,.9))}
-  .card.on{border-color:var(--accent)}
-  .wrap{display:grid;grid-template-columns:minmax(260px,460px) minmax(320px,1fr);gap:22px;max-width:1200px;margin:0 auto;align-items:start}
-  .preview{position:sticky;top:0;display:flex;flex-direction:column;gap:10px}
-  .preview img{width:100%;max-height:78vh;object-fit:contain;border-radius:14px;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-  .panel{display:flex;flex-direction:column;gap:12px}
-  .box{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:14px;display:flex;flex-direction:column;gap:10px}
-  .box h2{font-size:14px;margin:0}
-  label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
-  input[type=text],textarea{width:100%;background:#0f1115;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 10px;font:inherit;font-size:14px}
-  textarea{resize:vertical}
-  input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
-  .fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .fields label.wide{grid-column:1/-1}
-  .seg{display:grid;grid-template-columns:1fr 1fr;background:#0f1115;border:1px solid var(--line);border-radius:9px;padding:3px}
-  .seg button{border:0;background:transparent;color:var(--muted);padding:7px;border-radius:7px;font:inherit;font-weight:700;cursor:pointer}
-  .seg button.on{background:var(--accent);color:var(--accent-ink)}
-  .btn{border:1px solid var(--line);background:#0f1115;color:var(--text);border-radius:9px;padding:10px 12px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;gap:7px;align-items:center;justify-content:center;text-decoration:none}
-  .btn:hover{border-color:#3a3f4b}
-  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-  .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .steps{margin:0;padding-left:20px;color:var(--muted);font-size:13px}
-  .steps li{margin:3px 0}
-  .steps b{color:var(--text)}
-  .note{font-size:12px;color:var(--muted)}
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#22262e;border:1px solid var(--line);padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none;font-weight:600;z-index:9}
-  .toast.show{opacity:1;transform:translateX(-50%)}
-  @media (max-width:1000px){ .wrap{grid-template-columns:1fr} .preview{position:static} }
-  @media (max-width:760px){
-    .app{grid-template-columns:1fr;height:auto}
-    aside{border-right:0;border-bottom:1px solid var(--line)}
-    .list{grid-template-columns:repeat(4,1fr)}
-    main{padding:16px}
-    .fields{grid-template-columns:1fr}
-  }
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="ui.css">
 </head>
 <body>
 <div class="app">
   <aside>
-    <nav class="nav"><a href="index.html">Редактор</a><a href="ulgiler.html" class="on">Gemini үлгілері</a></nav>
-    <h1>Gemini үлгілері</h1>
-    <p class="sub">Үлгіні таңда. Gemini дәл сол дизайнды оқушының бетімен, жаңа мәтінмен қайта жасайды.</p>
+    <div class="brand"><span class="mark">JUZ40</span><span class="name">Сертификат</span></div>
+    <nav class="nav"><a href="index.html">Редактор</a><a href="ulgiler.html" class="on">Промпттар</a></nav>
     <div class="list" id="list"></div>
   </aside>
   <main>
@@ -82,7 +27,7 @@
       </div>
       <div class="panel">
         <div class="box">
-          <h2 id="exTitle"></h2>
+          <h2 class="title" id="exTitle"></h2>
           <div class="note" id="exDesc"></div>
           <div class="seg" id="gender">
             <button data-g="boy">Ұл бала</button>
@@ -92,12 +37,10 @@
             <button data-h="keep">Шаш: үлгідегідей</button>
             <button data-h="own">Шаш: оқушыныкі</button>
           </div>
-          <div class="note" id="hairNote"></div>
         </div>
         <div class="box">
           <h2>Мәтіндер</h2>
-          <div class="note">Өзгерткен мәтін промптқа өзі қосылады.</div>
-          <div class="fields" id="fields"></div>
+                    <div class="fields" id="fields"></div>
         </div>
         <div class="box">
           <h2>Промпт</h2>
@@ -106,12 +49,6 @@
             <button class="btn primary" id="copyPrompt">⧉ Промптты көшіру</button>
             <button class="btn" id="openGemini">Gemini ашу ↗</button>
           </div>
-          <ol class="steps">
-            <li>Gemini-ді аш (Nano Banana / сурет жасау режимі).</li>
-            <li><b>1-сурет:</b> оқушының фотосын тірке 📎.</li>
-            <li><b>2-сурет:</b> «Үлгіні көшіру» бас та, Gemini-ге Cmd/Ctrl+V арқылы қой (немесе жүктеп алып тірке).</li>
-            <li>Промптты қойып жібер. Мәтін қате шықса — «қайта жаса» немесе мәтінді түзетуді сұра.</li>
-          </ol>
         </div>
       </div>
     </div>
@@ -216,7 +153,6 @@ function select(ex){
   gender = store.get('g_'+ex.id) || ex.g;
   hairMode = store.get('h_'+ex.id) || (ex.hair ? 'keep' : 'own');
   document.querySelectorAll('#hair button').forEach(b=>b.classList.toggle('on', b.dataset.h===hairMode));
-  $('hairNote').textContent = ex.hair ? 'Бұл үлгіде шаш үлгісі ерекше — әдетте сол күйінде қалдырған дұрыс.' : 'Шаш қарапайым — оқушының өз шашын қалдыруға болады.';
   if (!values[ex.id]) values[ex.id] = store.get('v_'+ex.id) || ex.fields.map(f=>f.t);
   document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on', c.dataset.id===ex.id));
   $('exImg').src = `examples/${ex.id}.jpg`;
@@ -243,7 +179,7 @@ const list = $('list');
 EXAMPLES.forEach(ex=>{
   const b = document.createElement('button');
   b.className='card'; b.dataset.id=ex.id;
-  b.innerHTML = `<img src="examples/${ex.id}.jpg" alt="" loading="lazy"><span>${ex.title}</span>`;
+  b.innerHTML = `<img src="examples/${ex.id}.jpg" alt="" loading="lazy">`;
   b.onclick = ()=>{ select(ex); if (window.innerWidth<760) $('exImg').scrollIntoView({behavior:'smooth'}); };
   list.appendChild(b);
 });

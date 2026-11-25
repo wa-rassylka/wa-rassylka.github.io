@@ -6,99 +6,32 @@
 <title>Сертификат жасау</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Marck+Script&family=Bad+Script&family=Michroma&family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@400;500;600;700&family=Great+Vibes&family=Marck+Script&family=Bad+Script&family=Michroma&family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<style>
-  :root{
-    --bg:#0e0f12; --panel:#16181d; --panel2:#1d2027; --line:#2a2e37; --text:#eceef2; --muted:#8d93a0;
-    --accent:#f2b544; --accent-ink:#1a1405; --ok:#5bd68a; --danger:#ff6b6b;
-  }
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%}
-  body{background:var(--bg);color:var(--text);font:14px/1.45 Montserrat,system-ui,sans-serif}
-  .app{display:grid;grid-template-columns:400px 1fr;height:100vh}
-  aside{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:18px 18px 40px}
-  main{overflow:auto;padding:22px;display:flex;flex-direction:column;gap:14px;align-items:center}
-  h1{font-size:18px;margin:0 0 4px;letter-spacing:.02em}
-  .sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
-  details{border:1px solid var(--line);border-radius:12px;background:var(--panel2);margin-bottom:12px}
-  summary{cursor:pointer;list-style:none;padding:12px 14px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
-  summary::-webkit-details-marker{display:none}
-  summary::after{content:"▾";color:var(--muted);transition:transform .15s}
-  details:not([open]) summary::after{transform:rotate(-90deg)}
-  .body{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
-  label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
-  input[type=text],textarea{width:100%;background:#0f1115;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 10px;font:inherit;font-size:14px}
-  textarea{resize:vertical;min-height:64px}
-  input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .hint{font-size:12px;color:var(--muted)}
-  .hint b{color:var(--text)}
-  .nav{display:grid;grid-template-columns:1fr 1fr;background:#0f1115;border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:14px}
-  .nav a{color:var(--muted);text-decoration:none;text-align:center;padding:8px;border-radius:7px;font-weight:700;font-size:13px}
-  .nav a.on{background:var(--accent);color:var(--accent-ink)}
-  .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-  .themes.scroll{max-height:380px;overflow-y:auto;padding-right:4px}
-  .grpTitle{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-  .grpTitle span{color:var(--text)}
-  a.btn{text-decoration:none}
-  .theme{position:relative;border:2px solid transparent;border-radius:9px;overflow:hidden;cursor:pointer;padding:0;background:#000;aspect-ratio:16/10}
-  .theme img{width:100%;height:100%;object-fit:cover;object-position:80% 50%;display:block}
-  .theme span{position:absolute;left:0;right:0;bottom:0;padding:14px 5px 4px;font-size:10.5px;font-weight:700;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.85));text-align:left}
-  .theme.on{border-color:var(--accent)}
-  .seg{display:grid;grid-template-columns:1fr 1fr;background:#0f1115;border:1px solid var(--line);border-radius:9px;padding:3px}
-  .seg button{border:0;background:transparent;color:var(--muted);padding:7px;border-radius:7px;font:inherit;font-weight:700;cursor:pointer}
-  .seg button.on{background:var(--accent);color:var(--accent-ink)}
-  .btn{border:1px solid var(--line);background:#0f1115;color:var(--text);border-radius:9px;padding:10px 12px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;gap:7px;align-items:center;justify-content:center}
-  .btn:hover{border-color:#3a3f4b}
-  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
-  .btn.primary:hover{filter:brightness(1.06)}
-  .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .steps{margin:0;padding-left:18px;color:var(--muted);font-size:12.5px}
-  .steps li{margin:2px 0}
-  input[type=range]{width:100%;accent-color:var(--accent)}
-  .rangeRow{display:grid;grid-template-columns:90px 1fr 44px;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
-  .rangeRow output{text-align:right;color:var(--text)}
-  .stage{width:100%;max-width:1200px;position:relative}
-  canvas{width:100%;height:auto;display:block;border-radius:14px;box-shadow:0 20px 60px rgba(0,0,0,.5);background:#000}
-  .drop{position:absolute;inset:0;border:3px dashed var(--accent);border-radius:14px;background:rgba(242,181,68,.12);display:none;align-items:center;justify-content:center;font-weight:800;font-size:20px;color:#fff}
-  .stage.dragging .drop{display:flex}
-  .bar{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#22262e;border:1px solid var(--line);padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none;font-weight:600;z-index:9}
-  .toast.show{opacity:1;transform:translateX(-50%)}
-  .prog{font-size:12.5px;color:var(--muted);min-height:18px}
-  @media (max-width:900px){
-    .app{grid-template-columns:1fr;height:auto}
-    aside{border-right:0;border-bottom:1px solid var(--line)}
-    main{padding:16px}
-  }
-</style>
+<link rel="stylesheet" href="ui.css">
 </head>
 <body>
 <div class="app">
   <aside>
-    <nav class="nav"><a href="index.html" class="on">Редактор</a><a href="ulgiler.html">Gemini үлгілері</a></nav>
-    <h1>Сертификат жасау</h1>
-    <p class="sub">Фон таңда → Gemini-де оқушының суретін жаса → мәтінді өзгерт → PNG жүкте.</p>
+    <div class="brand"><span class="mark">JUZ40</span><span class="name">Сертификат</span></div>
+    <nav class="nav"><a href="index.html" class="on">Редактор</a><a href="ulgiler.html">Промпттар</a></nav>
 
     <details open>
-      <summary>1. Фон / тақырып</summary>
+      <summary><span class="n">1</span>Фон</summary>
       <div class="body">
-        <div class="grpTitle">Жаңа фондар</div>
         <div class="themes" id="themes"></div>
-        <div class="grpTitle">Фигмадағы сертификаттар <span id="figCount"></span></div>
+        <div class="divider"></div>
         <div class="themes scroll" id="themesFig"></div>
         <div class="btns">
           <button class="btn" id="uploadBtn">⬆ Өз суретің</button>
-          <button class="btn" id="resetBg">↺ Фонды қайтару</button>
+          <button class="btn" id="resetBg">↺ Қайтару</button>
         </div>
         <input type="file" id="file" accept="image/*" hidden>
-        <div class="hint">Суретті сертификаттың үстіне сүйреп әкелуге немесе <b>Cmd/Ctrl + V</b> арқылы қоюға болады.</div>
       </div>
     </details>
 
     <details open>
-      <summary>2. Gemini промпты</summary>
+      <summary><span class="n">2</span>Gemini промпты</summary>
       <div class="body">
         <div class="seg" id="gender">
           <button data-g="boy" class="on">Ұл бала</button>
@@ -107,49 +40,44 @@
         <textarea id="prompt" rows="9"></textarea>
         <div class="btns">
           <button class="btn primary" id="copyPrompt">⧉ Көшіру</button>
-          <button class="btn" id="openGemini">Gemini ашу ↗</button>
+          <button class="btn" id="openGemini">Gemini ↗</button>
         </div>
-        <a class="btn" id="dlBg" download>⬇ Фонды жүктеу (Gemini-ге тіркеу үшін)</a>
-        <ol class="steps">
-          <li>«Көшіру» бас, Gemini-ді аш.</li>
-          <li>Оқушының фотосын тіркеп (📎), промптты қойып жібер. Фигмадағы фондарда — фонды да тірке.</li>
-          <li>Шыққан суретті жүктеп ал да, осында сүйреп әкел немесе «Өз суретің» арқылы жүкте.</li>
-        </ol>
+        <a class="btn" id="dlBg" download>⬇ Фонды жүктеу</a>
       </div>
     </details>
 
     <details open>
-      <summary>3. Мәтіндер</summary>
+      <summary><span class="n">3</span>Мәтіндер</summary>
       <div class="body">
         <label>Оқушының аты-жөні
           <input type="text" id="f_name">
         </label>
-        <label>Сипаттама <span class="hint">— **жуан** деп жазсаң, жуан шығады</span>
+        <label>Сипаттама <span class="hint"><b>**сөз**</b> — bold</span>
           <textarea id="f_desc" rows="5"></textarea>
         </label>
         <div class="row">
           <label>Жоғарғы жазу<input type="text" id="f_badge"></label>
           <label>Тақырып<input type="text" id="f_title"></label>
         </div>
-        <label>Құндылықтар (үтір арқылы)
+        <label>Құндылықтар
           <input type="text" id="f_values">
         </label>
         <div class="row">
           <label>Сол жақ бұрыш<input type="text" id="f_left"></label>
           <label>Оң жақ бұрыш<input type="text" id="f_right"></label>
         </div>
-        <label>Қол қоюшы (әр жол — жаңа жол)
+        <label>Қол қоюшы
           <textarea id="f_signer" rows="3"></textarea>
         </label>
-        <label>Қол қоюшының лауазымы
+        <label>Лауазымы
           <textarea id="f_role" rows="2"></textarea>
         </label>
-        <button class="btn" id="resetText">↺ Мәтінді бастапқы қалпына</button>
+        <button class="btn" id="resetText">↺ Мәтінді қайтару</button>
       </div>
     </details>
 
     <details>
-      <summary>4. Фонды реттеу</summary>
+      <summary><span class="n">4</span>Фонды реттеу</summary>
       <div class="body">
         <div class="rangeRow">Үлкейту<input type="range" id="r_zoom" min="100" max="220" value="100"><output id="o_zoom"></output></div>
         <div class="rangeRow">Солға/оңға<input type="range" id="r_x" min="-60" max="40" value="0"><output id="o_x"></output></div>
@@ -159,12 +87,11 @@
     </details>
 
     <details>
-      <summary>5. Бірнеше оқушыға бірден</summary>
+      <summary><span class="n">5</span>Бірнеше оқушы</summary>
       <div class="body">
-        <label>Аты-жөндері (әр жолға бір оқушы)
+        <label>Аты-жөндері
           <textarea id="batch" rows="6" placeholder="Сауырбай Ислам&#10;Ахметова Аружан"></textarea>
         </label>
-        <div class="hint">Барлығы осы фон мен мәтінмен жасалып, бір ZIP файл болып жүктеледі.</div>
         <button class="btn primary" id="batchBtn">⬇ ZIP жүктеу</button>
         <div class="prog" id="prog"></div>
       </div>
@@ -177,8 +104,8 @@
       <div class="drop">Суретті осында таста</div>
     </div>
     <div class="bar">
-      <button class="btn primary" id="dl">⬇ PNG жүктеу</button>
-      <button class="btn" id="dlJpg">⬇ JPG жүктеу</button>
+      <button class="btn primary big" id="dl">⬇ PNG жүктеу</button>
+      <button class="btn big" id="dlJpg">⬇ JPG</button>
     </div>
   </main>
 </div>
@@ -419,7 +346,7 @@ const themesEl = document.getElementById('themes');
 function addThemeBtn(t, el){
   const b = document.createElement('button');
   b.className='theme'; b.dataset.id=t.id; b.title=t.t;
-  b.innerHTML = `<img src="${t.thumb || themeSrc(t)}" alt="" loading="lazy"><span>${t.t}</span>`;
+  b.innerHTML = `<img src="${t.thumb || themeSrc(t)}" alt="" loading="lazy">`;
   b.onclick = ()=>useTheme(t.id);
   el.appendChild(b);
 }
@@ -430,7 +357,6 @@ async function loadFigma(){
     FIGMA = list.map(([id, shade], i)=>({id, shade, figma:true, t:'№'+(i+1), src:`bg/figma/${id}.jpg`, thumb:`bg/figma/t/${id}.jpg`}));
     const el = document.getElementById('themesFig');
     FIGMA.forEach(t=>addThemeBtn(t, el));
-    document.getElementById('figCount').textContent = '· '+FIGMA.length;
   }catch(e){}
 }
 

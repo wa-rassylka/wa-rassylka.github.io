@@ -88,6 +88,11 @@
             <button data-g="boy">Ұл бала</button>
             <button data-g="girl">Қыз бала</button>
           </div>
+          <div class="seg" id="hair">
+            <button data-h="keep">Шаш: үлгідегідей</button>
+            <button data-h="own">Шаш: оқушыныкі</button>
+          </div>
+          <div class="note" id="hairNote"></div>
         </div>
         <div class="box">
           <h2>Мәтіндер</h2>
@@ -120,7 +125,7 @@ const EXAMPLES = [
     desc:'Қара студия, сұр кресло, қара костюм, қолдарын көтеріп отыр.',
     note:'Keep the dark studio background, the grey armchair, the black suit with black shirt and tie, the crossed-legs seated pose with both hands raised, the small JUZ40 logo at the top-left and the big bold white title at the bottom with a thin line between the two text lines.',
     fields:[{l:'Үстіңгі жазу',t:'ABSOLUTE'},{l:'Үлкен жазу',t:'ҮЗДІК'}] },
-  { id:'ex2', title:'Ретро-қала, күн бату', g:'girl', ratio:'16:9 landscape',
+  { id:'ex2', style:'illustration', title:'Ретро-қала, күн бату', g:'girl', ratio:'16:9 landscape',
     desc:'Пальмалар, күлгін-қызғылт күн бату, ретро көлік, иллюстрация стилі.',
     note:'Keep the stylized 80s retro illustration look: purple-pink-orange sunset sky, palm tree silhouettes, pastel art-deco buildings, the classic silver muscle car with the student sitting on its hood, the white inverted-triangle title frame at the top with bold condensed white letters, and the "JUZ40 EdTech" logo with lines at the bottom center. The person must be drawn in the same illustrated style as the rest of the poster.',
     fields:[{l:'Аты-жөні (1-жол)',t:'КЕРЕЕВА'},{l:'Аты-жөні (2-жол)',t:'АЙЫМ'},{l:'Астындағы жазу',t:'3.3 АПТА ҮЗДІГІ'}] },
@@ -128,17 +133,17 @@ const EXAMPLES = [
     desc:'Қараңғы үстел, полароид фото, құлыпты қорап, жазбалар, шам жарығы.',
     note:'Keep the dark cinematic desk scene with the warm desk lamp, the pinned paper note with the handwritten red-circled date and checklist, the black box with the glowing combination lock, the envelope, notebook, pen, mug, books and laptop. Put the student into the Polaroid photo on the left (same pose: hand under chin, dark suit). The combination lock digits must show the same date as the note. Keep all small decorative English texts as they are.',
     fields:[{l:'Үлкен тақырып',t:'МАҢЫЗДЫ КҮНДІ ҰМЫТПА'},{l:'Күні',t:'29.09'},{l:'Пән',t:'ИНФОРМАТИКА'},{l:'Полароид астындағы жазу',t:'Бір қадам үлкен нәтижеге!'}] },
-  { id:'ex4', title:'Ойын картасы', g:'girl', ratio:'4:5 portrait',
+  { id:'ex4', hair:'two high pigtails with bangs, black hair with red and blue dyed tips', title:'Ойын картасы', g:'girl', ratio:'4:5 portrait',
     desc:'Карта масттары фоны, ақ карта, клоун/джокер бейнесі, қолжазба тақырып.',
-    note:'Keep the dark background pattern of red and grey card suits (hearts, spades, clubs, diamonds), the cream-white playing card in the center with the folded corner and thin black frame, the burgundy handwritten script title, the two cartoon jester figures (top-left and bottom-right), the bold black name with the small black jester hat icon, and the thin bottom line with small labels. The student wears the same jester-inspired look: red-and-blue leather jacket, playful red-blue makeup around the eyes; for a boy keep the jacket and makeup but use a short boyish hairstyle instead of pigtails.',
+    note:'Keep the dark background pattern of red and grey card suits (hearts, spades, clubs, diamonds), the cream-white playing card in the center with the folded corner and thin black frame, the burgundy handwritten script title, the two cartoon jester figures (top-left and bottom-right), the bold black name with the small black jester hat icon, and the thin bottom line with small labels. The student wears the same jester-inspired look: red-and-blue leather jacket, playful red-blue makeup around the eyes.',
     fields:[{l:'Тақырып',t:'2 best results'},{l:'Аты-жөні',t:'Ermakhan Gulden'},{l:'Төменгі сол жақ',t:'TARIKH'},{l:'Төменгі оң жақ',t:'TEAM'}] },
-  { id:'ex5', title:'Көшпенділер эпосы', g:'boy', ratio:'4:5 portrait',
+  { id:'ex5', hair:'tight cornrow braids pulled straight back', title:'Көшпенділер эпосы', g:'boy', ratio:'4:5 portrait',
     desc:'Тарихи фильм постері: сол жақ — жылы шөл, оң жақ — суық тұман, батырлар.',
-    note:'Keep the epic historical Kazakh nomad movie-poster look: the student in the center close-up wearing a dark embroidered traditional robe with turquoise and amber bead necklace (for a girl: an embroidered dress and traditional headpiece), the warm golden desert side with warriors, yurts and caravans on the left, the cold misty blue side with dark warriors on the right, the large runic-style title between two horizontal lines, the gold rating text block at the bottom with the big number in the middle, and the small logos in the corners. Keep the runic title and corner runes exactly as in the reference.',
+    note:'Keep the epic historical Kazakh nomad movie-poster look: the student in the center close-up wearing a dark embroidered traditional robe with turquoise and amber bead necklace, the warm golden desert side with warriors, yurts and caravans on the left, the cold misty blue side with dark warriors on the right, the large runic-style title between two horizontal lines, the gold rating text block at the bottom with the big number in the middle, and the small logos in the corners. Keep the runic title and corner runes exactly as in the reference.',
     fields:[{l:'Аты-жөні (латынша)',t:'Kenzhebay Alikhan'},{l:'Сол жақ жазу',t:'ЖАЛПЫ РЕЙТИНГ БОЙЫНША'},{l:'Ортадағы сан',t:'1'},{l:'Оң жақ жазу',t:'3-АЙ 3-АПТА ҮЗДІГІ'}] },
   { id:'ex6', title:'Ақ студия, TOP', g:'boy', ratio:'1:1 square',
     desc:'Ақ фон, смокинг, алтын түсті үлкен TOP және балл.',
-    note:'Keep the clean white studio background, the standing pose adjusting the bow tie, black tuxedo with white shirt (for a girl: an elegant black suit or dress in the same style), the gold name text in the top-right, the two rounded pill labels (grey-blue and dark navy), the big gold gradient "TOP" text and score, and the thin bottom line with a small label on the left.',
+    note:'Keep the clean white studio background, the standing pose adjusting the bow tie, black tuxedo with white shirt, the gold name text in the top-right, the two rounded pill labels (grey-blue and dark navy), the big gold gradient "TOP" text and score, and the thin bottom line with a small label on the left.',
     fields:[{l:'Аты-жөні',t:'ШАПАРХАНОВ ЕСКЕНДИР'},{l:'1-белгі',t:'1-ай 2-апта РТ'},{l:'2-белгі (пән)',t:'ФИЗИКА'},{l:'Орны',t:'TOP 5'},{l:'Балл',t:'188.5/195'},{l:'Төменгі жазу',t:'БАЛКА'}] },
   { id:'ex7', title:'Чемпион', g:'boy', ratio:'3:4 portrait',
     desc:'Қызыл түтін, прожекторлар, чемпион белдігі, алтын TOP-1.',
@@ -156,6 +161,7 @@ const store = {
 };
 let cur = EXAMPLES.find(e=>e.id===store.get('cur')) || EXAMPLES[0];
 let gender = cur.g;
+let hairMode = cur.hair ? 'keep' : 'own';
 const values = {}; // per example: array of texts
 
 const $ = id => document.getElementById(id);
@@ -167,19 +173,27 @@ function buildPrompt(){
   const changes = cur.fields.map((f,i)=>({from:f.t, to:(vals[i]??f.t).trim()}));
   const changed = changes.filter(c=>c.to && c.to!==c.from);
   const kept = changes.filter(c=>!c.to || c.to===c.from);
-  const genderLine = gender===cur.g
-    ? 'Keep the same outfit style as in Image 2.'
-    : `The person in Image 2 is a ${cur.g==='girl'?'girl':'boy'}, but the student is a ${gender==='girl'?'girl':'boy'} — adapt the outfit and hairstyle naturally for a ${gender==='girl'?'girl':'boy'} while keeping the same theme, colors and mood.`;
+  const g2 = cur.g==='girl'?'girl':'boy', g1 = gender==='girl'?'girl':'boy';
+  const genderLine = gender===cur.g ? '' :
+    `\n   The person in Image 2 is a ${g2}, but the student is a ${g1}: keep the same outfit, pose, hands and colors, and only adjust the face and body shape naturally so it looks like a ${g1}.`;
+  const hairLine = hairMode==='keep'
+    ? `HAIR: keep the hairstyle from Image 2 exactly as it is${cur.hair?` (${cur.hair})`:''} — same shape, length, color and parting. Only the face changes.`
+    : `HAIR: use the student's own hairstyle and hair color from Image 1, styled neatly to fit the poster.`;
+  const faceStyle = cur.style==='illustration'
+    ? 'Draw the student\'s face in the same illustrated style as the rest of the poster, but clearly recognizable.'
+    : 'Match the lighting, angle, skin texture and expression of the original so it looks like a real photo, not a pasted face.';
 
   let txt = `I am attaching 2 images:
 • Image 1 — a photo of the student (a ${who}).
-• Image 2 — a finished poster that is the design reference.
+• Image 2 — the finished poster (the reference).
 
-Recreate Image 2 as a new poster. Keep the SAME composition, layout, camera angle, pose, background, lighting, color palette, typography style, logo and decorative elements. Change only the following:
+TASK: EDIT Image 2. Use Image 2 as the base image and keep it identical — the same composition, framing, crop, camera angle, pose, hands, clothing, background, lighting, colors, grain, typography, logos and every decorative element. Do NOT redesign, restyle, move, add or remove anything.
 
-1. PERSON: replace the person in Image 2 with the student from Image 1. The face must stay exactly the same as in Image 1 — same identity, facial features, eye shape, skin tone, and glasses if the student wears them — so the student is clearly recognizable. ${genderLine}
+Change ONLY these things:
 
-2. DESIGN DETAILS: ${cur.note}
+1. FACE: replace the face of the person in Image 2 with the face of the student from Image 1 — exactly the same identity, facial features, face shape, eyes, nose, lips, eyebrows, skin tone, and glasses if the student wears them. ${faceStyle}${genderLine}
+
+2. ${hairLine}
 
 3. TEXT:`;
   if (changed.length){
@@ -190,7 +204,9 @@ Recreate Image 2 as a new poster. Keep the SAME composition, layout, camera angl
     txt += ' keep all texts exactly as in Image 2.\n';
   }
   txt += `
-Output: one image, same aspect ratio as Image 2 (${cur.ratio}), high quality, sharp details, photorealistic face. Do not add any extra text, watermarks or logos.`;
+Details of Image 2 that must stay unchanged: ${cur.note}
+
+Output: one image with exactly the same size and aspect ratio as Image 2 (${cur.ratio}), high quality and sharp. Everything except the face${hairMode==='keep'?'':', hair'} and the listed texts must look exactly like Image 2. No extra text, watermarks or logos.`;
   return txt;
 }
 function refresh(){ promptEl.value = buildPrompt(); }
@@ -198,6 +214,9 @@ function refresh(){ promptEl.value = buildPrompt(); }
 function select(ex){
   cur = ex; store.set('cur', ex.id);
   gender = store.get('g_'+ex.id) || ex.g;
+  hairMode = store.get('h_'+ex.id) || (ex.hair ? 'keep' : 'own');
+  document.querySelectorAll('#hair button').forEach(b=>b.classList.toggle('on', b.dataset.h===hairMode));
+  $('hairNote').textContent = ex.hair ? 'Бұл үлгіде шаш үлгісі ерекше — әдетте сол күйінде қалдырған дұрыс.' : 'Шаш қарапайым — оқушының өз шашын қалдыруға болады.';
   if (!values[ex.id]) values[ex.id] = store.get('v_'+ex.id) || ex.fields.map(f=>f.t);
   document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on', c.dataset.id===ex.id));
   $('exImg').src = `examples/${ex.id}.jpg`;
@@ -229,6 +248,10 @@ EXAMPLES.forEach(ex=>{
   list.appendChild(b);
 });
 
+document.querySelectorAll('#hair button').forEach(b=>b.onclick=()=>{
+  hairMode=b.dataset.h; store.set('h_'+cur.id, hairMode);
+  document.querySelectorAll('#hair button').forEach(x=>x.classList.toggle('on',x===b)); refresh();
+});
 document.querySelectorAll('#gender button').forEach(b=>b.onclick=()=>{
   gender=b.dataset.g; store.set('g_'+cur.id, gender);
   document.querySelectorAll('#gender button').forEach(x=>x.classList.toggle('on',x===b)); refresh();

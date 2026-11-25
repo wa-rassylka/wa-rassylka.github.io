@@ -38,6 +38,10 @@
   .nav a{color:var(--muted);text-decoration:none;text-align:center;padding:8px;border-radius:7px;font-weight:700;font-size:13px}
   .nav a.on{background:var(--accent);color:var(--accent-ink)}
   .themes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .themes.scroll{max-height:380px;overflow-y:auto;padding-right:4px}
+  .grpTitle{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+  .grpTitle span{color:var(--text)}
+  a.btn{text-decoration:none}
   .theme{position:relative;border:2px solid transparent;border-radius:9px;overflow:hidden;cursor:pointer;padding:0;background:#000;aspect-ratio:16/10}
   .theme img{width:100%;height:100%;object-fit:cover;object-position:80% 50%;display:block}
   .theme span{position:absolute;left:0;right:0;bottom:0;padding:14px 5px 4px;font-size:10.5px;font-weight:700;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.85));text-align:left}
@@ -80,7 +84,10 @@
     <details open>
       <summary>1. Фон / тақырып</summary>
       <div class="body">
+        <div class="grpTitle">Жаңа фондар</div>
         <div class="themes" id="themes"></div>
+        <div class="grpTitle">Фигмадағы сертификаттар <span id="figCount"></span></div>
+        <div class="themes scroll" id="themesFig"></div>
         <div class="btns">
           <button class="btn" id="uploadBtn">⬆ Өз суретің</button>
           <button class="btn" id="resetBg">↺ Фонды қайтару</button>
@@ -102,9 +109,10 @@
           <button class="btn primary" id="copyPrompt">⧉ Көшіру</button>
           <button class="btn" id="openGemini">Gemini ашу ↗</button>
         </div>
+        <a class="btn" id="dlBg" download>⬇ Фонды жүктеу (Gemini-ге тіркеу үшін)</a>
         <ol class="steps">
           <li>«Көшіру» бас, Gemini-ді аш.</li>
-          <li>Оқушының фотосын тіркеп (📎), промптты қойып жібер.</li>
+          <li>Оқушының фотосын тіркеп (📎), промптты қойып жібер. Фигмадағы фондарда — фонды да тірке.</li>
           <li>Шыққан суретті жүктеп ал да, осында сүйреп әкел немесе «Өз суретің» арқылы жүкте.</li>
         </ol>
       </div>
@@ -227,10 +235,22 @@ const state = {
 };
 
 /* ---------- prompt ---------- */
+let FIGMA = [];
+function getTheme(id){ return THEMES.find(t=>t.id===id) || FIGMA.find(t=>t.id===id); }
+function themeSrc(th){ return th.src || ('bg/'+th.id+'.jpg'); }
 function buildPrompt(){
-  const th = THEMES.find(t=>t.id===state.theme) || THEMES[0];
+  const th = getTheme(state.theme) || THEMES[0];
   const who = state.gender==='girl' ? 'teenage girl' : 'teenage boy';
   const pos = state.gender==='girl' ? 'her' : 'his';
+  if (th.figma) return `I am attaching 2 images:
+• Image 1 — a photo of a ${who}.
+• Image 2 — a background scene (the reference).
+
+EDIT Image 2: keep the scene, composition, art style, colors and lighting exactly the same. If there is a main character in Image 2, replace that character's face with the face of the ${who} from Image 1 and keep the character's pose, clothing and hairstyle; if there is no character, add the ${who} on the right third of the frame in a pose that fits the scene.
+
+The face must be exactly the same as in Image 1 — same identity, facial features, eyes, nose, lips, skin tone, and glasses if ${state.gender==='girl'?'she wears':'he wears'} them — and drawn in the same style as Image 2 so it looks natural. Keep the left half of the image dark and empty for text, exactly like Image 2.
+
+Output: one image with the same size and aspect ratio as Image 2. No extra text, letters, logos or watermarks.`;
   return `Use the attached photo of a ${who}. Keep ${pos} face exactly the same — same identity, facial features, skin tone and hairstyle — so ${state.gender==='girl'?'she':'he'} is clearly recognizable.
 
 Show the ${who} ${th.s}.
@@ -248,9 +268,12 @@ function loadImg(src){
   return cache[src];
 }
 async function useTheme(id){
+  const th = getTheme(id) || THEMES[0]; id = th.id;
   state.theme=id; state.custom=false; store.set('theme',id);
-  state.img = await loadImg('bg/'+id+'.jpg');
+  state.shade = th.shade ?? 1;
+  state.img = await loadImg(themeSrc(th));
   document.querySelectorAll('.theme').forEach(b=>b.classList.toggle('on', b.dataset.id===id));
+  const dlBg = document.getElementById('dlBg'); if (dlBg){ dlBg.href = themeSrc(th); dlBg.download = 'Фон - '+th.t+'.jpg'; }
   refreshPrompt(); draw();
 }
 function useFile(file){
@@ -307,8 +330,9 @@ function draw(){
     ctx.drawImage(img, x, y, w, h);
   }
 
-  // shading
-  const d = A.dark/100;
+  // shading (Figma backgrounds already contain their own shading)
+  const d = (state.custom || state.shade !== 0) ? A.dark/100 : 0;
+  if (d > 0){
   let g = ctx.createLinearGradient(0,0,W*0.85,0);
   g.addColorStop(0, `rgba(0,0,0,${0.97*d})`);
   g.addColorStop(0.42, `rgba(0,0,0,${0.85*d})`);
@@ -321,6 +345,7 @@ function draw(){
   g = ctx.createLinearGradient(0,H-430,0,H);
   g.addColorStop(0,'rgba(0,0,0,0)'); g.addColorStop(1,`rgba(0,0,0,${0.92*Math.max(d,.5)})`);
   ctx.fillStyle=g; ctx.fillRect(0,H-430,W,430);
+  }
 
   ctx.fillStyle='#fff'; ctx.textBaseline='alphabetic';
 
@@ -391,13 +416,23 @@ function draw(){
 
 /* ---------- UI wiring ---------- */
 const themesEl = document.getElementById('themes');
-THEMES.forEach(t=>{
+function addThemeBtn(t, el){
   const b = document.createElement('button');
   b.className='theme'; b.dataset.id=t.id; b.title=t.t;
-  b.innerHTML = `<img src="bg/${t.id}.jpg" alt="" loading="lazy"><span>${t.t}</span>`;
+  b.innerHTML = `<img src="${t.thumb || themeSrc(t)}" alt="" loading="lazy"><span>${t.t}</span>`;
   b.onclick = ()=>useTheme(t.id);
-  themesEl.appendChild(b);
-});
+  el.appendChild(b);
+}
+THEMES.forEach(t=>addThemeBtn(t, themesEl));
+async function loadFigma(){
+  try{
+    const list = await (await fetch('bg/figma/list.json')).json();
+    FIGMA = list.map(([id, shade], i)=>({id, shade, figma:true, t:'№'+(i+1), src:`bg/figma/${id}.jpg`, thumb:`bg/figma/t/${id}.jpg`}));
+    const el = document.getElementById('themesFig');
+    FIGMA.forEach(t=>addThemeBtn(t, el));
+    document.getElementById('figCount').textContent = '· '+FIGMA.length;
+  }catch(e){}
+}
 
 document.querySelectorAll('#gender button').forEach(b=>{
   b.classList.toggle('on', b.dataset.g===state.gender);
@@ -493,6 +528,7 @@ let tt; function toast(msg){ const t=document.getElementById('toast'); t.textCon
       document.fonts.load(`800 35px Montserrat`, 'әғқңөұүһі'),
     ]);
   }catch(e){}
+  await loadFigma();
   await useTheme(state.theme);
   document.fonts.ready.then(draw);
 })();

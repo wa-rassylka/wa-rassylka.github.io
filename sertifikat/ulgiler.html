@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="kk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gemini үлгілері</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0e0f12; --panel:#16181d; --panel2:#1d2027; --line:#2a2e37; --text:#eceef2; --muted:#8d93a0;
+    --accent:#f2b544; --accent-ink:#1a1405;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--text);font:14px/1.45 Montserrat,system-ui,sans-serif}
+  .app{display:grid;grid-template-columns:330px 1fr;height:100vh}
+  aside{background:var(--panel);border-right:1px solid var(--line);overflow-y:auto;padding:18px 16px 40px}
+  main{overflow:auto;padding:22px}
+  h1{font-size:18px;margin:0 0 4px}
+  .sub{color:var(--muted);font-size:12.5px;margin:0 0 14px}
+  .nav{display:grid;grid-template-columns:1fr 1fr;background:#0f1115;border:1px solid var(--line);border-radius:10px;padding:3px;margin-bottom:14px}
+  .nav a{color:var(--muted);text-decoration:none;text-align:center;padding:8px;border-radius:7px;font-weight:700;font-size:13px}
+  .nav a.on{background:var(--accent);color:var(--accent-ink)}
+  .list{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+  .card{border:2px solid transparent;border-radius:11px;overflow:hidden;background:#000;cursor:pointer;padding:0;text-align:left;color:#fff;font:inherit;position:relative;aspect-ratio:3/4}
+  .card img{width:100%;height:100%;object-fit:cover;display:block}
+  .card span{position:absolute;left:0;right:0;bottom:0;padding:18px 7px 6px;font-size:11.5px;font-weight:700;background:linear-gradient(transparent,rgba(0,0,0,.9))}
+  .card.on{border-color:var(--accent)}
+  .wrap{display:grid;grid-template-columns:minmax(260px,460px) minmax(320px,1fr);gap:22px;max-width:1200px;margin:0 auto;align-items:start}
+  .preview{position:sticky;top:0;display:flex;flex-direction:column;gap:10px}
+  .preview img{width:100%;max-height:78vh;object-fit:contain;border-radius:14px;background:#000;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+  .panel{display:flex;flex-direction:column;gap:12px}
+  .box{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:14px;display:flex;flex-direction:column;gap:10px}
+  .box h2{font-size:14px;margin:0}
+  label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
+  input[type=text],textarea{width:100%;background:#0f1115;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:9px 10px;font:inherit;font-size:14px}
+  textarea{resize:vertical}
+  input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .fields label.wide{grid-column:1/-1}
+  .seg{display:grid;grid-template-columns:1fr 1fr;background:#0f1115;border:1px solid var(--line);border-radius:9px;padding:3px}
+  .seg button{border:0;background:transparent;color:var(--muted);padding:7px;border-radius:7px;font:inherit;font-weight:700;cursor:pointer}
+  .seg button.on{background:var(--accent);color:var(--accent-ink)}
+  .btn{border:1px solid var(--line);background:#0f1115;color:var(--text);border-radius:9px;padding:10px 12px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;gap:7px;align-items:center;justify-content:center;text-decoration:none}
+  .btn:hover{border-color:#3a3f4b}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .steps{margin:0;padding-left:20px;color:var(--muted);font-size:13px}
+  .steps li{margin:3px 0}
+  .steps b{color:var(--text)}
+  .note{font-size:12px;color:var(--muted)}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#22262e;border:1px solid var(--line);padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;pointer-events:none;font-weight:600;z-index:9}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  @media (max-width:1000px){ .wrap{grid-template-columns:1fr} .preview{position:static} }
+  @media (max-width:760px){
+    .app{grid-template-columns:1fr;height:auto}
+    aside{border-right:0;border-bottom:1px solid var(--line)}
+    .list{grid-template-columns:repeat(4,1fr)}
+    main{padding:16px}
+    .fields{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <nav class="nav"><a href="index.html">Редактор</a><a href="ulgiler.html" class="on">Gemini үлгілері</a></nav>
+    <h1>Gemini үлгілері</h1>
+    <p class="sub">Үлгіні таңда. Gemini дәл сол дизайнды оқушының бетімен, жаңа мәтінмен қайта жасайды.</p>
+    <div class="list" id="list"></div>
+  </aside>
+  <main>
+    <div class="wrap">
+      <div class="preview">
+        <img id="exImg" alt="Үлгі">
+        <div class="btns">
+          <button class="btn" id="copyImg">⧉ Үлгіні көшіру</button>
+          <a class="btn" id="dlImg" download>⬇ Үлгіні жүктеу</a>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="box">
+          <h2 id="exTitle"></h2>
+          <div class="note" id="exDesc"></div>
+          <div class="seg" id="gender">
+            <button data-g="boy">Ұл бала</button>
+            <button data-g="girl">Қыз бала</button>
+          </div>
+        </div>
+        <div class="box">
+          <h2>Мәтіндер</h2>
+          <div class="note">Өзгерткен мәтін промптқа өзі қосылады.</div>
+          <div class="fields" id="fields"></div>
+        </div>
+        <div class="box">
+          <h2>Промпт</h2>
+          <textarea id="prompt" rows="14"></textarea>
+          <div class="btns">
+            <button class="btn primary" id="copyPrompt">⧉ Промптты көшіру</button>
+            <button class="btn" id="openGemini">Gemini ашу ↗</button>
+          </div>
+          <ol class="steps">
+            <li>Gemini-ді аш (Nano Banana / сурет жасау режимі).</li>
+            <li><b>1-сурет:</b> оқушының фотосын тірке 📎.</li>
+            <li><b>2-сурет:</b> «Үлгіні көшіру» бас та, Gemini-ге Cmd/Ctrl+V арқылы қой (немесе жүктеп алып тірке).</li>
+            <li>Промптты қойып жібер. Мәтін қате шықса — «қайта жаса» немесе мәтінді түзетуді сұра.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const EXAMPLES = [
+  { id:'ex1', title:'Absolute үздік', g:'boy', ratio:'2:3 portrait',
+    desc:'Қара студия, сұр кресло, қара костюм, қолдарын көтеріп отыр.',
+    note:'Keep the dark studio background, the grey armchair, the black suit with black shirt and tie, the crossed-legs seated pose with both hands raised, the small JUZ40 logo at the top-left and the big bold white title at the bottom with a thin line between the two text lines.',
+    fields:[{l:'Үстіңгі жазу',t:'ABSOLUTE'},{l:'Үлкен жазу',t:'ҮЗДІК'}] },
+  { id:'ex2', title:'Ретро-қала, күн бату', g:'girl', ratio:'16:9 landscape',
+    desc:'Пальмалар, күлгін-қызғылт күн бату, ретро көлік, иллюстрация стилі.',
+    note:'Keep the stylized 80s retro illustration look: purple-pink-orange sunset sky, palm tree silhouettes, pastel art-deco buildings, the classic silver muscle car with the student sitting on its hood, the white inverted-triangle title frame at the top with bold condensed white letters, and the "JUZ40 EdTech" logo with lines at the bottom center. The person must be drawn in the same illustrated style as the rest of the poster.',
+    fields:[{l:'Аты-жөні (1-жол)',t:'КЕРЕЕВА'},{l:'Аты-жөні (2-жол)',t:'АЙЫМ'},{l:'Астындағы жазу',t:'3.3 АПТА ҮЗДІГІ'}] },
+  { id:'ex3', title:'Маңызды күнді ұмытпа', g:'boy', ratio:'2:3 portrait',
+    desc:'Қараңғы үстел, полароид фото, құлыпты қорап, жазбалар, шам жарығы.',
+    note:'Keep the dark cinematic desk scene with the warm desk lamp, the pinned paper note with the handwritten red-circled date and checklist, the black box with the glowing combination lock, the envelope, notebook, pen, mug, books and laptop. Put the student into the Polaroid photo on the left (same pose: hand under chin, dark suit). The combination lock digits must show the same date as the note. Keep all small decorative English texts as they are.',
+    fields:[{l:'Үлкен тақырып',t:'МАҢЫЗДЫ КҮНДІ ҰМЫТПА'},{l:'Күні',t:'29.09'},{l:'Пән',t:'ИНФОРМАТИКА'},{l:'Полароид астындағы жазу',t:'Бір қадам үлкен нәтижеге!'}] },
+  { id:'ex4', title:'Ойын картасы', g:'girl', ratio:'4:5 portrait',
+    desc:'Карта масттары фоны, ақ карта, клоун/джокер бейнесі, қолжазба тақырып.',
+    note:'Keep the dark background pattern of red and grey card suits (hearts, spades, clubs, diamonds), the cream-white playing card in the center with the folded corner and thin black frame, the burgundy handwritten script title, the two cartoon jester figures (top-left and bottom-right), the bold black name with the small black jester hat icon, and the thin bottom line with small labels. The student wears the same jester-inspired look: red-and-blue leather jacket, playful red-blue makeup around the eyes; for a boy keep the jacket and makeup but use a short boyish hairstyle instead of pigtails.',
+    fields:[{l:'Тақырып',t:'2 best results'},{l:'Аты-жөні',t:'Ermakhan Gulden'},{l:'Төменгі сол жақ',t:'TARIKH'},{l:'Төменгі оң жақ',t:'TEAM'}] },
+  { id:'ex5', title:'Көшпенділер эпосы', g:'boy', ratio:'4:5 portrait',
+    desc:'Тарихи фильм постері: сол жақ — жылы шөл, оң жақ — суық тұман, батырлар.',
+    note:'Keep the epic historical Kazakh nomad movie-poster look: the student in the center close-up wearing a dark embroidered traditional robe with turquoise and amber bead necklace (for a girl: an embroidered dress and traditional headpiece), the warm golden desert side with warriors, yurts and caravans on the left, the cold misty blue side with dark warriors on the right, the large runic-style title between two horizontal lines, the gold rating text block at the bottom with the big number in the middle, and the small logos in the corners. Keep the runic title and corner runes exactly as in the reference.',
+    fields:[{l:'Аты-жөні (латынша)',t:'Kenzhebay Alikhan'},{l:'Сол жақ жазу',t:'ЖАЛПЫ РЕЙТИНГ БОЙЫНША'},{l:'Ортадағы сан',t:'1'},{l:'Оң жақ жазу',t:'3-АЙ 3-АПТА ҮЗДІГІ'}] },
+  { id:'ex6', title:'Ақ студия, TOP', g:'boy', ratio:'1:1 square',
+    desc:'Ақ фон, смокинг, алтын түсті үлкен TOP және балл.',
+    note:'Keep the clean white studio background, the standing pose adjusting the bow tie, black tuxedo with white shirt (for a girl: an elegant black suit or dress in the same style), the gold name text in the top-right, the two rounded pill labels (grey-blue and dark navy), the big gold gradient "TOP" text and score, and the thin bottom line with a small label on the left.',
+    fields:[{l:'Аты-жөні',t:'ШАПАРХАНОВ ЕСКЕНДИР'},{l:'1-белгі',t:'1-ай 2-апта РТ'},{l:'2-белгі (пән)',t:'ФИЗИКА'},{l:'Орны',t:'TOP 5'},{l:'Балл',t:'188.5/195'},{l:'Төменгі жазу',t:'БАЛКА'}] },
+  { id:'ex7', title:'Чемпион', g:'boy', ratio:'3:4 portrait',
+    desc:'Қызыл түтін, прожекторлар, чемпион белдігі, алтын TOP-1.',
+    note:'Keep the dark red smoky arena background with spotlights, the big gold "TOP-1" title, the "WEEK … STUDENT CHAMPION" lines, the gold-framed photo of the student as a champion fighter in a black-and-gold team jacket holding a big gold championship belt (use a generic champion belt and jacket without any real brand logos), the dark red certificate panel with white text, and the bottom section with the signature on the left and the score list on the right.',
+    fields:[{l:'Апта',t:'WEEK 4.4'},{l:'Аты-жөні',t:'АМАНЖОЛ АРСЕН'},{l:'Сипаттама',t:'ТАРИХ пәні бойынша 4-АЙ 4-АПТА жоғары нәтиже көрсетіп, үздіктер қатарында болып, ТОП-1 атанғаны үшін'},{l:'Кімнен',t:'Марха апайдан'},{l:'Балдар',t:'FULL / ПС 60/60 / КУИЗ 20/20 / ЖЖ 25/25 / СТ 14/15'}] },
+  { id:'ex8', title:'Жаңа жыл', g:'boy', ratio:'3:4 portrait',
+    desc:'Шырша, жылы жарық, Аяз Ата костюміндегі жасыл мультфильм кейіпкері.',
+    note:'Keep the warm cozy Christmas scene: decorated Christmas tree with golden bokeh lights, the student in a dark coat with a red-green knitted holiday scarf, the furry green holiday creature in a red Santa suit standing next to the student holding a red ornament, the thin red frame, the small JUZ40 logo at the top, the white handwritten script name, the dark rounded label with bold white text, and the thin bottom line with a small signature text on the left.',
+    fields:[{l:'Аты-жөні',t:'Турсунбой Рустам'},{l:'Белгідегі жазу',t:'2-АЙ 3-АПТА ҮЗДІГІ'},{l:'Төменгі жазу',t:'Диля апайдың'}] },
+];
+
+const store = {
+  get(k){ try{ return JSON.parse(localStorage.getItem('ulgi_'+k)); }catch(e){ return null; } },
+  set(k,v){ try{ localStorage.setItem('ulgi_'+k, JSON.stringify(v)); }catch(e){} },
+};
+let cur = EXAMPLES.find(e=>e.id===store.get('cur')) || EXAMPLES[0];
+let gender = cur.g;
+const values = {}; // per example: array of texts
+
+const $ = id => document.getElementById(id);
+const promptEl = $('prompt');
+
+function buildPrompt(){
+  const who = gender==='girl' ? 'teenage girl' : 'teenage boy';
+  const vals = values[cur.id];
+  const changes = cur.fields.map((f,i)=>({from:f.t, to:(vals[i]??f.t).trim()}));
+  const changed = changes.filter(c=>c.to && c.to!==c.from);
+  const kept = changes.filter(c=>!c.to || c.to===c.from);
+  const genderLine = gender===cur.g
+    ? 'Keep the same outfit style as in Image 2.'
+    : `The person in Image 2 is a ${cur.g==='girl'?'girl':'boy'}, but the student is a ${gender==='girl'?'girl':'boy'} — adapt the outfit and hairstyle naturally for a ${gender==='girl'?'girl':'boy'} while keeping the same theme, colors and mood.`;
+
+  let txt = `I am attaching 2 images:
+• Image 1 — a photo of the student (a ${who}).
+• Image 2 — a finished poster that is the design reference.
+
+Recreate Image 2 as a new poster. Keep the SAME composition, layout, camera angle, pose, background, lighting, color palette, typography style, logo and decorative elements. Change only the following:
+
+1. PERSON: replace the person in Image 2 with the student from Image 1. The face must stay exactly the same as in Image 1 — same identity, facial features, eye shape, skin tone, and glasses if the student wears them — so the student is clearly recognizable. ${genderLine}
+
+2. DESIGN DETAILS: ${cur.note}
+
+3. TEXT:`;
+  if (changed.length){
+    txt += ' replace these texts exactly (same font style, size, color and position; Kazakh letters Ә Ғ Қ Ң Ө Ұ Ү Һ І must be spelled correctly):\n';
+    changed.forEach(c=>{ txt += `   • "${c.from}" → "${c.to}"\n`; });
+    if (kept.length) txt += `   Keep all other texts exactly as in Image 2.\n`;
+  } else {
+    txt += ' keep all texts exactly as in Image 2.\n';
+  }
+  txt += `
+Output: one image, same aspect ratio as Image 2 (${cur.ratio}), high quality, sharp details, photorealistic face. Do not add any extra text, watermarks or logos.`;
+  return txt;
+}
+function refresh(){ promptEl.value = buildPrompt(); }
+
+function select(ex){
+  cur = ex; store.set('cur', ex.id);
+  gender = store.get('g_'+ex.id) || ex.g;
+  if (!values[ex.id]) values[ex.id] = store.get('v_'+ex.id) || ex.fields.map(f=>f.t);
+  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('on', c.dataset.id===ex.id));
+  $('exImg').src = `examples/${ex.id}.jpg`;
+  $('dlImg').href = `examples/${ex.id}.jpg`;
+  $('dlImg').download = `Үлгі - ${ex.title}.jpg`;
+  $('exTitle').textContent = ex.title;
+  $('exDesc').textContent = ex.desc;
+  document.querySelectorAll('#gender button').forEach(b=>b.classList.toggle('on', b.dataset.g===gender));
+  const box = $('fields'); box.innerHTML='';
+  ex.fields.forEach((f,i)=>{
+    const lab = document.createElement('label');
+    if (f.t.length > 28) lab.className='wide';
+    lab.textContent = f.l;
+    const inp = document.createElement(f.t.length > 40 ? 'textarea' : 'input');
+    if (inp.tagName==='INPUT') inp.type='text'; else inp.rows=3;
+    inp.value = values[ex.id][i];
+    inp.addEventListener('input', ()=>{ values[ex.id][i]=inp.value; store.set('v_'+ex.id, values[ex.id]); refresh(); });
+    lab.appendChild(inp); box.appendChild(lab);
+  });
+  refresh();
+}
+
+const list = $('list');
+EXAMPLES.forEach(ex=>{
+  const b = document.createElement('button');
+  b.className='card'; b.dataset.id=ex.id;
+  b.innerHTML = `<img src="examples/${ex.id}.jpg" alt="" loading="lazy"><span>${ex.title}</span>`;
+  b.onclick = ()=>{ select(ex); if (window.innerWidth<760) $('exImg').scrollIntoView({behavior:'smooth'}); };
+  list.appendChild(b);
+});
+
+document.querySelectorAll('#gender button').forEach(b=>b.onclick=()=>{
+  gender=b.dataset.g; store.set('g_'+cur.id, gender);
+  document.querySelectorAll('#gender button').forEach(x=>x.classList.toggle('on',x===b)); refresh();
+});
+
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); return true; }
+  catch(e){ promptEl.select(); return document.execCommand('copy'); }
+}
+$('copyPrompt').onclick = async ()=>{ await copyText(promptEl.value); toast('Промпт көшірілді ✓'); };
+$('openGemini').onclick = async ()=>{ await copyText(promptEl.value); window.open('https://gemini.google.com/app','_blank','noopener'); toast('Промпт көшірілді — фото мен үлгіні тіркеп, қойыңыз'); };
+
+$('copyImg').onclick = async ()=>{
+  try{
+    const img = $('exImg');
+    const c = document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight;
+    c.getContext('2d').drawImage(img,0,0);
+    const blob = await new Promise(r=>c.toBlob(r,'image/png'));
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+    toast('Үлгі көшірілді — Gemini-ге Cmd/Ctrl+V');
+  }catch(e){ toast('Көшіру болмады — «Үлгіні жүктеу» батырмасын басыңыз'); }
+};
+
+let tt; function toast(m){ const t=$('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove('show'),2600); }
+
+select(cur);
+</script>
+</body>
+</html>
